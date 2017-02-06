@@ -19,8 +19,6 @@ FIND_LIBRARY(ZMQ_LIB NAMES zmq)
 FIND_LIBRARY(HAL_LIB NAMES matrix_creator_hal)
 FIND_LIBRARY(MATRIX_LIB NAMES matrix_malos)
 FIND_LIBRARY(MATRIX_ZMQ_LIB NAMES matrix_malos_zmq)
-FIND_LIBRARY(WIRINGPI_LIB NAMES wiringPi)
-
 
 message(STATUS "ZMQ found => " "${ZMQ_LIB}")
 message(STATUS "HAL found => " "${HAL_LIB}")
@@ -33,22 +31,21 @@ include_directories(
   ${PROJECT_BINARY_DIR} # Protos.
   ${PROTOBUF_INCLUDE_DIRS})
 
-set(malos_zigbee_src
-  malos_zigbee.cpp
+set(malos_wakeword
+  malos_wakeword.cpp
   driver_manager.cpp driver_manager.h
-  driver_zigbee.cpp driver_zigbee.h
-  tcp_client.cpp tcp_client.h
+  driver_wakeword.cpp driver_wakeword.h
   ${MALOS_PROTO_SRC} ${MALOS_PROTO_HEADER}
 )
 
-add_executable(malos_zigbee ${malos_zigbee_src})
-  set_property(TARGET malos_zigbee PROPERTY CXX_STANDARD 11)
-  target_link_libraries(malos_zigbee ${PROTOBUF_LIBRARY})
-  target_link_libraries(malos_zigbee ${CMAKE_THREAD_LIBS_INIT})
-  target_link_libraries(malos_zigbee ${MATRIX_LIB})
-  target_link_libraries(malos_zigbee ${MATRIX_ZMQ_LIB} ${ZMQ_LIB})
-  target_link_libraries(malos_zigbee ${SPHINXBASE_LIBRARIES})
-  target_link_libraries(malos_zigbee ${POCKETSPHINX_LIBRARIES})
+add_executable(malos_wakeword ${malos_wakeword})
+  set_property(TARGET malos_wakeword PROPERTY CXX_STANDARD 11)
+  target_link_libraries(malos_wakeword ${PROTOBUF_LIBRARY})
+  target_link_libraries(malos_wakeword ${CMAKE_THREAD_LIBS_INIT})
+  target_link_libraries(malos_wakeword ${MATRIX_LIB})
+  target_link_libraries(malos_wakeword ${MATRIX_ZMQ_LIB} ${ZMQ_LIB})
+  target_link_libraries(malos_wakeword ${SPHINXBASE_LIBRARIES})
+  target_link_libraries(malos_wakeword ${POCKETSPHINX_LIBRARIES})
 
 # Binary to be installed.
-install(TARGETS malos_zigbee DESTINATION bin)
+install(TARGETS malos_wakeword DESTINATION bin)
