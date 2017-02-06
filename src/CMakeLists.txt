@@ -47,8 +47,8 @@ add_executable(malos_zigbee ${malos_zigbee_src})
   target_link_libraries(malos_zigbee ${CMAKE_THREAD_LIBS_INIT})
   target_link_libraries(malos_zigbee ${MATRIX_LIB})
   target_link_libraries(malos_zigbee ${MATRIX_ZMQ_LIB} ${ZMQ_LIB})
-  target_link_libraries(malos ${SPHINXBASE_LIBRARIES})
-  target_link_libraries(malos ${POCKETSPHINX_LIBRARIES})
+  target_link_libraries(malos_zigbee ${SPHINXBASE_LIBRARIES})
+  target_link_libraries(malos_zigbee ${POCKETSPHINX_LIBRARIES})
 
 # Binary to be installed.
 install(TARGETS malos_zigbee DESTINATION bin)
