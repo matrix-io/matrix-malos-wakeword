@@ -7,6 +7,11 @@ ADM_EXTRA_WARNINGS()
 
 find_package(Protobuf 3 REQUIRED)
 find_package(Threads REQUIRED)
+find_package(PkgConfig)
+
+# adding sphinx libraries via pkgconfig
+pkg_search_module(SPHINXBASE REQUIRED sphinxbase)
+pkg_search_module(POCKETSPHINX REQUIRED pocketsphinx)
 
 # This won't find ZQM in custom locations.
 # FIXME(nelson.castillo): Improve.
@@ -42,6 +47,8 @@ add_executable(malos_zigbee ${malos_zigbee_src})
   target_link_libraries(malos_zigbee ${CMAKE_THREAD_LIBS_INIT})
   target_link_libraries(malos_zigbee ${MATRIX_LIB})
   target_link_libraries(malos_zigbee ${MATRIX_ZMQ_LIB} ${ZMQ_LIB})
+  target_link_libraries(malos ${SPHINXBASE_LIBRARIES})
+  target_link_libraries(malos ${POCKETSPHINX_LIBRARIES})
 
 # Binary to be installed.
 install(TARGETS malos_zigbee DESTINATION bin)
