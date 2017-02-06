@@ -31,14 +31,14 @@ include_directories(
   ${PROJECT_BINARY_DIR} # Protos.
   ${PROTOBUF_INCLUDE_DIRS})
 
-set(malos_wakeword
+set(malos_wakeword_src
   malos_wakeword.cpp
   driver_manager.cpp driver_manager.h
   driver_wakeword.cpp driver_wakeword.h
   ${MALOS_PROTO_SRC} ${MALOS_PROTO_HEADER}
 )
 
-add_executable(malos_wakeword ${malos_wakeword})
+add_executable(malos_wakeword ${malos_wakeword_src})
   set_property(TARGET malos_wakeword PROPERTY CXX_STANDARD 11)
   target_link_libraries(malos_wakeword ${PROTOBUF_LIBRARY})
   target_link_libraries(malos_wakeword ${CMAKE_THREAD_LIBS_INIT})
