@@ -31,6 +31,9 @@
 
 namespace {
 
+static ps_decoder_t *ps_;
+static cmd_ln_t *config_;
+
 /* Sleep for specified msec */
 static void sleep_msec(int32 ms) {
 #if (defined(_WIN32) && !defined(GNUWINCE)) || defined(_WIN32_WCE)
@@ -84,7 +87,7 @@ static void recognize_from_microphone() {
       ps_end_utt(ps_);
       hyp = ps_get_hyp(ps_, NULL);
       if (hyp != NULL) {
-        process_rules(hyp);
+        //process_rules(hyp);
         fflush(stdout);
       }
 
