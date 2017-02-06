@@ -21,7 +21,6 @@
 #include <memory>
 
 #include <matrix_malos/malos_base.h>
-#include "./tcp_client.h"
 #include "./src/driver.pb.h"
 
 const char kWakeWordDriverName[] = "WakeWord";
