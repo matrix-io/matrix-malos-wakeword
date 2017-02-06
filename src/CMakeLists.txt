@@ -49,9 +49,8 @@ add_executable(psphix_wakeword psphix_wakeword.cpp)
   set_property(TARGET psphix_wakeword PROPERTY CXX_STANDARD 11)
   target_include_directories(psphix_wakeword PUBLIC ${SPHINXBASE_INCLUDE_DIRS})
   target_include_directories(psphix_wakeword PUBLIC ${POCKETSPHINX_INCLUDE_DIRS})
-  target_link_libraries(${CMAKE_THREAD_LIBS_INIT})
-  target_link_libraries(${SPHINXBASE_LIBRARIES})
-  target_link_libraries(${POCKETSPHINX_LIBRARIES})
+  target_link_libraries(psphix_wakeword ${SPHINXBASE_LIBRARIES})
+  target_link_libraries(psphix_wakeword ${POCKETSPHINX_LIBRARIES})
 
 # Binary to be installed.
 install(TARGETS malos_wakeword DESTINATION bin)
