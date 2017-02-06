@@ -40,14 +40,18 @@ set(malos_wakeword_src
 
 add_executable(malos_wakeword ${malos_wakeword_src})
   set_property(TARGET malos_wakeword PROPERTY CXX_STANDARD 11)
-  target_include_directories(malos_wakeword PUBLIC ${SPHINXBASE_INCLUDE_DIRS})
-  target_include_directories(malos_wakeword PUBLIC ${POCKETSPHINX_INCLUDE_DIRS})
   target_link_libraries(malos_wakeword ${PROTOBUF_LIBRARY})
   target_link_libraries(malos_wakeword ${CMAKE_THREAD_LIBS_INIT})
   target_link_libraries(malos_wakeword ${MATRIX_LIB})
   target_link_libraries(malos_wakeword ${MATRIX_ZMQ_LIB} ${ZMQ_LIB})
-  target_link_libraries(malos_wakeword ${SPHINXBASE_LIBRARIES})
-  target_link_libraries(malos_wakeword ${POCKETSPHINX_LIBRARIES})
+
+add_executable(psphix_wakeword psphix_wakeword.cpp)
+  set_property(TARGET psphix_wakeword PROPERTY CXX_STANDARD 11)
+  target_include_directories(psphix_wakeword PUBLIC ${SPHINXBASE_INCLUDE_DIRS})
+  target_include_directories(psphix_wakeword PUBLIC ${POCKETSPHINX_INCLUDE_DIRS})
+  target_link_libraries(${CMAKE_THREAD_LIBS_INIT})
+  target_link_libraries(${SPHINXBASE_LIBRARIES})
+  target_link_libraries(${POCKETSPHINX_LIBRARIES})
 
 # Binary to be installed.
 install(TARGETS malos_wakeword DESTINATION bin)
