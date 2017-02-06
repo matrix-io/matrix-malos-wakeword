@@ -41,7 +41,7 @@ int RunServer() {
 
 
   WakeWordDriver driver_wakeword;
-  if (!driver_wakeword.Init(kBasePort + 4 * 5 + 1, kUnsecureBindScope)) {
+  if (!driver_wakeword.Init(kBasePort + 4 * 10 + 1, kUnsecureBindScope)) {
     return 1;
   }
   driver_manager.RegisterDriver(&driver_wakeword);
