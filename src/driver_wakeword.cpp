@@ -14,33 +14,36 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-#include <assert.h>
-#include <stdio.h>
 #include <cstring>
-#include <chrono>
-#include <thread>
 #include <iostream>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string>
 
 #include "./driver_wakeword.h"
 #include "./src/driver.pb.h"
 
-namespace {
-
-} // namespace
+namespace {} // namespace
 
 namespace matrix_malos {
 
-bool WakeWordDriver::ProcessConfig(const DriverConfig& config) {
+bool WakeWordDriver::ProcessConfig(const DriverConfig &config) {
   // TODO @hpsaturn: Validate all the data that comes from the protos
   WakeWordParams wakeword_params(config.wakeword());
+  const int16_t mode = static_cast<int16_t>(wakeword_params.channel());
+  //"-keyphrase "MATRIX" -kws_threshold 1e-20 -dict assets/$REF.dic -lm
+  // assets/$REF.lm -inmic yes -adcdev mic_channel$MIC"
+  if (system(std::string(
+                 "psphix_wakeword -keyphrase " + wakeword_params.wake_word() +
+                 " -kws_threshold 1e-10 -inmic yes -adcdev mic_channel" +
+                 std::to_string(mode))
+                 .c_str()) == -1) {
+    zmq_push_error_->Send("psphix_wakeword failed");
+    return false;
+  }
 
   return true;
 }
 
-bool WakeWordDriver::SendUpdate() {
-
-  return true;
-}
+bool WakeWordDriver::SendUpdate() { return true; }
 }
