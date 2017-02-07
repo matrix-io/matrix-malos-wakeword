@@ -28,24 +28,40 @@ namespace {} // namespace
 namespace matrix_malos {
 
 bool WakeWordDriver::ProcessConfig(const DriverConfig &config) {
-  // TODO @hpsaturn: Validate all the data that comes from the protos
+
   WakeWordParams wakeword_params(config.wakeword());
   const int16_t mode = static_cast<int16_t>(wakeword_params.channel());
-  //"-keyphrase "MATRIX" -kws_threshold 1e-20 -dict assets/$REF.dic -lm
-  // assets/$REF.lm -inmic yes -adcdev mic_channel$MIC"
-  std::string cmd=std::string(
-                 "psphix_wakeword -keyphrase \"" + wakeword_params.wake_word() +
-                 "\" -kws_threshold 1e-10 -inmic yes -adcdev mic_channel" +
-                 std::to_string(mode));
+  const std::string wakeword = std::string("" + wakeword_params.wake_word());
+
+  std::string cmd = std::string(
+      "psphix_wakeword -keyphrase \"" + wakeword +
+      "\" -kws_threshold 1e-10 -inmic yes -adcdev mic_channel" +
+      std::to_string(mode));
   std::cerr << "cmd: " << cmd << std::endl;
 
-  if (system(cmd.c_str()) == -1) {
-    zmq_push_error_->Send("psphix_wakeword failed");
+  FILE *in;
+  char buff[512];
+
+  if (!(in = popen(cmd.c_str(), "r"))) {
     return false;
   }
+
+  char matchbuff[100];
+  snprintf(matchbuff, sizeof(matchbuff), "match: %s\n", wakeword.c_str());
+  std::string matchAsStdStr = matchbuff;
+
+  while (fgets(buff, sizeof(buff), in) != NULL) {
+    if (std::strcmp(buff, matchbuff) == 0)
+      std::cerr << "run_callback!: " << cmd << std::endl;
+  }
+  pclose(in);
 
   return true;
 }
 
-bool WakeWordDriver::SendUpdate() { return true; }
+bool WakeWordDriver::SendUpdate() { 
+  
+  return true; 
+
+}
 }
