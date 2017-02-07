@@ -51,8 +51,14 @@ bool WakeWordDriver::ProcessConfig(const DriverConfig &config) {
   std::string matchAsStdStr = matchbuff;
 
   while (fgets(buff, sizeof(buff), in) != NULL) {
-    if (std::strcmp(buff, matchbuff) == 0)
+    if (std::strcmp(buff, matchbuff) == 0){
       std::cerr << "run_callback!: " << cmd << std::endl;
+      WakeWordParams wakewordUpdate;
+      wakewordUpdate.set_wake_word(wakeword);
+      std::string buffer;
+      wakewordUpdate.SerializeToString(&buffer);
+      zqm_push_update_->Send(buffer);
+    }
   }
   pclose(in);
 
