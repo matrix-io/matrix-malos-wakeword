@@ -33,11 +33,13 @@ bool WakeWordDriver::ProcessConfig(const DriverConfig &config) {
   const int16_t mode = static_cast<int16_t>(wakeword_params.channel());
   //"-keyphrase "MATRIX" -kws_threshold 1e-20 -dict assets/$REF.dic -lm
   // assets/$REF.lm -inmic yes -adcdev mic_channel$MIC"
-  if (system(std::string(
+  std::string cmd=std::string(
                  "psphix_wakeword -keyphrase " + wakeword_params.wake_word() +
                  " -kws_threshold 1e-10 -inmic yes -adcdev mic_channel" +
-                 std::to_string(mode))
-                 .c_str()) == -1) {
+                 std::to_string(mode));
+  std::cerr << "cmd: " << cmd << std::endl;
+
+  if (system(cmd.c_str()) == -1) {
     zmq_push_error_->Send("psphix_wakeword failed");
     return false;
   }
