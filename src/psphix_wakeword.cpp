@@ -74,7 +74,7 @@ static ps_decoder_t *ps_;
 static cmd_ln_t *config_;
 
 void process_rules(const char *hyp) {
-  
+  printf("match: %s\n", hyp); 
 }
 
 /* Sleep for specified msec */
