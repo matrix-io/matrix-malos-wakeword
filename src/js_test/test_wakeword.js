@@ -31,6 +31,17 @@ function startWakeUpRecognition(){
   sendConfigProto(wakeword_config);
 }
 
+// ***** Register update callback:
+var updateSocket = zmq.socket('sub')
+updateSocket.connect('tcp://' + creator_ip + ':' + (creator_wakeword_base_port + 3))
+updateSocket.subscribe('')
+
+updateSocket.on('message', function(wakeword_buffer) {
+  var wakeWordData = new matrixMalosBuilder.WakeWordParams.decode(wakeword_buffer)
+  // output in binary format all 15 pins of GPIO
+  console.log('<== WakeWord Reached!',wakeWordData.wake_word)
+});
+
 /**
  * sendConfigProto: build Proto message 
  * and send it.
