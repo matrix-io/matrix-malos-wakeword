@@ -26,7 +26,7 @@ configSocket.connect('tcp://' + creator_ip + ':' + creator_wakeword_base_port /*
 
 function startWakeUpRecognition(){
   var wakeword_config = new matrixMalosBuilder.WakeWordParams;
-  wakeword_config.set_wake_word("Hey Matrix");
+  wakeword_config.set_wake_word("hey hey");
   wakeword_config.set_channel(matrixMalosBuilder.WakeWordParams.MicChannel.channel0);
   sendConfigProto(wakeword_config);
 }
