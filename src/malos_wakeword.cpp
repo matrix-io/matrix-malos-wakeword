@@ -34,11 +34,11 @@ int RunServer() {
   std::cerr << "**************" << std::endl;
   std::cerr << std::endl;
 
-  DriverManager driver_manager(kBasePort+100, kUnsecureBindScope);
+  // TODO: @hpsaturn : kBasePort+100 is a provisional fix
+  DriverManager driver_manager(kBasePort + 100, kUnsecureBindScope);
   std::cerr << "You can query specific driver info using port " +
                    std::to_string(20012)
             << "." << std::endl;
-
 
   WakeWordDriver driver_wakeword;
   if (!driver_wakeword.Init(kBasePort + 4 * 10 + 1, kUnsecureBindScope)) {
@@ -48,8 +48,8 @@ int RunServer() {
 
   driver_manager.ServeInfoRequestsForEver();
 
-  return 0;  // Never reached.
+  return 0; // Never reached.
 }
-}  // namespace matrix_malos
+} // namespace matrix_malos
 
-int main(int, char* []) { return matrix_malos::RunServer(); }
+int main(int, char *[]) { return matrix_malos::RunServer(); }
