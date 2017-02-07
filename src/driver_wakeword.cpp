@@ -34,8 +34,8 @@ bool WakeWordDriver::ProcessConfig(const DriverConfig &config) {
   //"-keyphrase "MATRIX" -kws_threshold 1e-20 -dict assets/$REF.dic -lm
   // assets/$REF.lm -inmic yes -adcdev mic_channel$MIC"
   std::string cmd=std::string(
-                 "psphix_wakeword -keyphrase " + wakeword_params.wake_word() +
-                 " -kws_threshold 1e-10 -inmic yes -adcdev mic_channel" +
+                 "psphix_wakeword -keyphrase \"" + wakeword_params.wake_word() +
+                 "\" -kws_threshold 1e-10 -inmic yes -adcdev mic_channel" +
                  std::to_string(mode));
   std::cerr << "cmd: " << cmd << std::endl;
 
