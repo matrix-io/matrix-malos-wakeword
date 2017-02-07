@@ -30,7 +30,7 @@ namespace matrix_malos {
 
 int RunServer() {
   std::cerr << "**************" << std::endl;
-  std::cerr << "MALOS WakeWord starting" << std::endl;
+  std::cerr << "MALOS WakeWord" << std::endl;
   std::cerr << "**************" << std::endl;
   std::cerr << std::endl;
 
