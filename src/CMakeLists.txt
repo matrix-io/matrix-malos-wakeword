@@ -54,3 +54,5 @@ add_executable(psphix_wakeword psphix_wakeword.cpp)
 
 # Binary to be installed.
 install(TARGETS malos_wakeword DESTINATION bin)
+install(TARGETS psphix_wakeword DESTINATION bin)
+
