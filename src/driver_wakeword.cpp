@@ -38,7 +38,7 @@ bool WakeWordDriver::ProcessConfig(const DriverConfig &config) {
                   std::to_string(mode));
   std::cerr << "cmd: " << cmd << std::endl;
 
-  if (!(in = popen(cmd.c_str(), "r"))) {
+  if (!(sphinx_pipe_ = popen(cmd.c_str(), "r"))) {
     return false;
   }
 

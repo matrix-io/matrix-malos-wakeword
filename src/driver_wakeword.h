@@ -22,8 +22,8 @@
 #include <memory>
 #include <thread>
 
-#include <matrix_malos/malos_base.h>
 #include "./src/driver.pb.h"
+#include <matrix_malos/malos_base.h>
 
 const char kWakeWordDriverName[] = "WakeWord";
 
@@ -32,7 +32,7 @@ namespace matrix_malos {
 // FIXME: inherit from malos_base.h
 
 class WakeWordDriver : public MalosBase {
- public:
+public:
   WakeWordDriver() : MalosBase(kWakeWordDriverName) {
     SetNeedsKeepalives(true);
     SetMandatoryConfiguration(true);
@@ -40,23 +40,23 @@ class WakeWordDriver : public MalosBase {
   }
 
   // Read configuration from the outside workd.
-  bool ProcessConfig(const DriverConfig& config) override;
+  bool ProcessConfig(const DriverConfig &config) override;
 
   // Send updates. Checks for new messages from WakeWord.
   bool SendUpdate() override;
 
- private:
+private:
   // Thread that read events from pocketsphinx
   void PocketSphinxProcess();
 
- private:
+private:
   // pipe handler for pocketsphinx
-  FILE* sphinx_pipe_
+  FILE *sphinx_pipe_;
 
-      // message used to store WakeWord and mic config
-      WakeWordParams wakeword_params_;
+  // message used to store WakeWord and mic config
+  WakeWordParams wakeword_params_;
 };
 
-}  // namespace matrix_malos
+} // namespace matrix_malos
 
-#endif  // SRC_DRIVER_WAKEWORD_H_
+#endif // SRC_DRIVER_WAKEWORD_H_
