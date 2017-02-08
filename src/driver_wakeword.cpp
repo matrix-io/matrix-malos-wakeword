@@ -14,44 +14,50 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-#include <cstring>
-#include <iostream>
 #include <stdio.h>
 #include <stdlib.h>
+#include <cstring>
+#include <iostream>
 #include <string>
 
 #include "./driver_wakeword.h"
 #include "./src/driver.pb.h"
 
-namespace {} // namespace
+namespace {}  // namespace
 
 namespace matrix_malos {
 
 bool WakeWordDriver::ProcessConfig(const DriverConfig &config) {
-
   WakeWordParams wakeword_params(config.wakeword());
   const int16_t mode = static_cast<int16_t>(wakeword_params.channel());
   const std::string wakeword = std::string("" + wakeword_params.wake_word());
 
-  std::string cmd = std::string(
-      "psphix_wakeword -keyphrase \"" + wakeword +
-      "\" -kws_threshold 1e-10 -inmic yes -adcdev mic_channel" +
-      std::to_string(mode));
+  std::string cmd =
+      std::string("psphix_wakeword -keyphrase \"" + wakeword +
+                  "\" -kws_threshold 1e-10 -inmic yes -adcdev mic_channel" +
+                  std::to_string(mode));
   std::cerr << "cmd: " << cmd << std::endl;
-
-  FILE *in;
-  char buff[512];
 
   if (!(in = popen(cmd.c_str(), "r"))) {
     return false;
   }
 
+  // alsa thread.
+  std::thread pocketsphinx_thread(&WakeWordDriver::PocketSphinxProcess, this);
+  pocketsphinx_thread.detach();
+
+  return true;
+}
+
+void WakeWordDriver::PocketSphinxProcess() {
+  char buff[512];
+
   char matchbuff[100];
   snprintf(matchbuff, sizeof(matchbuff), "match: %s\n", wakeword.c_str());
   std::string matchAsStdStr = matchbuff;
 
-  while (fgets(buff, sizeof(buff), in) != NULL) {
-    if (std::strcmp(buff, matchbuff) == 0){
+  while (fgets(buff, sizeof(buff), sphinx_pipe_) != NULL) {
+    if (std::strcmp(buff, matchbuff) == 0) {
       std::cerr << "run_callback!: " << cmd << std::endl;
       WakeWordParams wakewordUpdate;
       wakewordUpdate.set_wake_word(wakeword);
@@ -60,14 +66,9 @@ bool WakeWordDriver::ProcessConfig(const DriverConfig &config) {
       zqm_push_update_->Send(buffer);
     }
   }
+
   pclose(in);
-
-  return true;
 }
 
-bool WakeWordDriver::SendUpdate() { 
-  
-  return true; 
-
-}
+bool WakeWordDriver::SendUpdate() { return true; }
 }

@@ -37,7 +37,7 @@
  *                and continuous file transcription.
  *
  * This is a simple example of pocketsphinx application that uses continuous
- * listening with silence filtering to automatically segment a continuous stream 
+ * listening with silence filtering to automatically segment a continuous stream
  * of audio input into utterances that are then decoded.
  *
  * Remarks:
@@ -52,12 +52,12 @@
 #include <assert.h>
 #include <stdio.h>
 
-#include <cstring>
-#include <iostream>
-#include <stdlib.h>
-#include <string>
 #include <sphinxbase/ad.h>
 #include <sphinxbase/err.h>
+#include <stdlib.h>
+#include <cstring>
+#include <iostream>
+#include <string>
 #include "pocketsphinx.h"
 
 static const arg_t cont_args_def[] = {
@@ -73,9 +73,7 @@ static const arg_t cont_args_def[] = {
 static ps_decoder_t *ps_;
 static cmd_ln_t *config_;
 
-void process_rules(const char *hyp) {
-  printf("match: %s\n", hyp); 
-}
+void process_rules(const char *hyp) { printf("match: %s\n", hyp); }
 
 /* Sleep for specified msec */
 static void sleep_msec(int32 ms) {
@@ -105,11 +103,9 @@ static void recognize_from_microphone() {
   if ((ad = ad_open_dev(cmd_ln_str_r(config_, "-adcdev"),
                         (int)cmd_ln_float32_r(config_, "-samprate"))) == NULL)
     E_FATAL("Failed to open audio device\n");
-  if (ad_start_rec(ad) < 0)
-    E_FATAL("Failed to start recording\n");
+  if (ad_start_rec(ad) < 0) E_FATAL("Failed to start recording\n");
 
-  if (ps_start_utt(ps_) < 0)
-    E_FATAL("Failed to start utterance\n");
+  if (ps_start_utt(ps_) < 0) E_FATAL("Failed to start utterance\n");
   uint8 utt_started = FALSE;
   E_INFO("Ready....\n");
 
@@ -134,8 +130,7 @@ static void recognize_from_microphone() {
         fflush(stdout);
       }
 
-      if (ps_start_utt(ps_) < 0)
-        E_FATAL("Failed to start utterance\n");
+      if (ps_start_utt(ps_) < 0) E_FATAL("Failed to start utterance\n");
       utt_started = FALSE;
       E_INFO("Ready....\n");
     }
@@ -155,9 +150,10 @@ int main(int argc, char *argv[]) {
   }
 
   if (config_ == NULL || (cmd_ln_str_r(config_, "-infile") == NULL &&
-                         cmd_ln_boolean_r(config_, "-inmic") == FALSE)) {
-    E_INFO("Specify '-infile <file.wav>' to recognize from file or '-inmic "
-           "yes' to recognize from microphone.\n");
+                          cmd_ln_boolean_r(config_, "-inmic") == FALSE)) {
+    E_INFO(
+        "Specify '-infile <file.wav>' to recognize from file or '-inmic "
+        "yes' to recognize from microphone.\n");
     cmd_ln_free_r(config_);
     return 1;
   }

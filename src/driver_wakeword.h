@@ -18,7 +18,9 @@
 #ifndef SRC_DRIVER_WAKEWORD_H_
 #define SRC_DRIVER_WAKEWORD_H_
 
+#include <cstdio>
 #include <memory>
+#include <thread>
 
 #include <matrix_malos/malos_base.h>
 #include "./src/driver.pb.h"
@@ -44,9 +46,15 @@ class WakeWordDriver : public MalosBase {
   bool SendUpdate() override;
 
  private:
+  // Thread that read events from pocketsphinx
+  void PocketSphinxProcess();
 
-  // message used to store WakeWord and mic config
-  WakeWordParams wakeword_params;
+ private:
+  // pipe handler for pocketsphinx
+  FILE* sphinx_pipe_
+
+      // message used to store WakeWord and mic config
+      WakeWordParams wakeword_params_;
 };
 
 }  // namespace matrix_malos
