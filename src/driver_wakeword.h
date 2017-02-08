@@ -55,6 +55,8 @@ private:
 
   // message used to store WakeWord and mic config
   WakeWordParams wakeword_params_;
+
+  std::string wakeword;
 };
 
 } // namespace matrix_malos

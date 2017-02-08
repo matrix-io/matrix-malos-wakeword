@@ -30,13 +30,13 @@ namespace matrix_malos {
 bool WakeWordDriver::ProcessConfig(const DriverConfig &config) {
   WakeWordParams wakeword_params(config.wakeword());
   const int16_t mode = static_cast<int16_t>(wakeword_params.channel());
-  const std::string wakeword = std::string("" + wakeword_params.wake_word());
-
+  wakeword = std::string("" + wakeword_params.wake_word());
+  std::cout << "wakeword: " << wakeword <<  std::endl;
   std::string cmd =
       std::string("psphix_wakeword -keyphrase \"" + wakeword +
                   "\" -kws_threshold 1e-10 -inmic yes -adcdev mic_channel" +
                   std::to_string(mode));
-  std::cerr << "cmd: " << cmd << std::endl;
+  std::cout << "cmd: " << cmd << std::endl;
 
   if (!(sphinx_pipe_ = popen(cmd.c_str(), "r"))) {
     return false;
@@ -56,9 +56,11 @@ void WakeWordDriver::PocketSphinxProcess() {
   snprintf(matchbuff, sizeof(matchbuff), "match: %s\n", wakeword.c_str());
   std::string matchAsStdStr = matchbuff;
 
+  std::cout << "PocketSphinxProcess thread" << std::endl;
   while (fgets(buff, sizeof(buff), sphinx_pipe_) != NULL) {
+    std::cout << buff << std::endl;
     if (std::strcmp(buff, matchbuff) == 0) {
-      std::cerr << "run_callback!: " << cmd << std::endl;
+      std::cout << "sending ZMQ push.." << std::endl;
       WakeWordParams wakewordUpdate;
       wakewordUpdate.set_wake_word(wakeword);
       std::string buffer;
@@ -67,7 +69,7 @@ void WakeWordDriver::PocketSphinxProcess() {
     }
   }
 
-  pclose(in);
+  pclose(sphinx_pipe_);
 }
 
 bool WakeWordDriver::SendUpdate() { return true; }
