@@ -10,7 +10,7 @@
 // BasePort + 2 => Error port. Receive errros from device.
 // BasePort + 3 => Data port. Receive data from device.
 
-var creator_ip = '192.168.1.115';
+var creator_ip = '127.0.0.1';
 var creator_wakeword_base_port = 20013 + 40;
 var protoBuf = require("protobufjs");
 var zmq = require('zmq');
@@ -38,7 +38,6 @@ updateSocket.subscribe('')
 
 updateSocket.on('message', function(wakeword_buffer) {
   var wakeWordData = new matrixMalosBuilder.WakeWordParams.decode(wakeword_buffer)
-  // output in binary format all 15 pins of GPIO
   console.log('<== WakeWord Reached!',wakeWordData.wake_word)
 });
 
