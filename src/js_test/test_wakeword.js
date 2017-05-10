@@ -11,7 +11,7 @@
 // BasePort + 3 => Data port. Receive data from device.
 
 var creator_ip = '192.168.1.103';
-var creator_wakeword_base_port = 20013 + 40;
+var creator_wakeword_base_port = 60001;
 var protoBuf = require("protobufjs");
 var zmq = require('zmq');
 
@@ -26,8 +26,11 @@ configSocket.connect('tcp://' + creator_ip + ':' + creator_wakeword_base_port /*
 
 function startWakeUpRecognition(){
   var wakeword_config = new matrixMalosBuilder.WakeWordParams;
-  wakeword_config.set_wake_word("hey hey");
+  wakeword_config.set_wake_word("MATRIX");
   wakeword_config.set_channel(matrixMalosBuilder.WakeWordParams.MicChannel.channel0);
+  wakeword_config.set_lm_path("/home/pi/assets/6706.lm");
+  wakeword_config.set_dic_path("/home/pi/assets/6706.dic");
+  wakeword_config.set_actions_path("/home/pi/assets/matrix_commands.txt");
   sendConfigProto(wakeword_config);
 }
 
