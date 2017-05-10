@@ -19,10 +19,10 @@
 #include <iostream>
 #include <thread>
 
-#include "./driver_manager.h"
+#include <matrix_malos/driver_manager.h>
 #include "./driver_wakeword.h"
 
-const int kBasePort = 20012;
+const int kBasePort = 60000;
 
 const char kUnsecureBindScope[] = "*";
 
@@ -34,14 +34,13 @@ int RunServer() {
   std::cerr << "**************" << std::endl;
   std::cerr << std::endl;
 
-  // TODO: @hpsaturn : kBasePort+100 is a provisional fix
-  DriverManager driver_manager(kBasePort + 100, kUnsecureBindScope);
+  DriverManager driver_manager(kBasePort, kUnsecureBindScope);
   std::cerr << "You can query specific driver info using port " +
-                   std::to_string(20012)
+                   std::to_string(kBasePort)
             << "." << std::endl;
 
   WakeWordDriver driver_wakeword;
-  if (!driver_wakeword.Init(kBasePort + 4 * 10 + 1, kUnsecureBindScope)) {
+  if (!driver_wakeword.Init(kBasePort + 1, kUnsecureBindScope)) {
     return 1;
   }
   driver_manager.RegisterDriver(&driver_wakeword);

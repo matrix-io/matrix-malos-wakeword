@@ -24,6 +24,8 @@ message(STATUS "ZMQ found => " "${ZMQ_LIB}")
 message(STATUS "HAL found => " "${HAL_LIB}")
 message(STATUS "MATRIX LIB found => " "${MATRIX_LIB}")
 message(STATUS "MATRIX ZMQ LIB found => " "${MATRIX_ZMQ_LIB}")
+message(STATUS "SPHINXBASE_LIBRARIES => " "${SPHINXBASE_LIBRARIES}")
+message(STATUS "POCKETSPHINX_LIBRARIES => " "${POCKETSPHINX_LIBRARIES}")
 
 PROTOBUF_GENERATE_CPP(MALOS_PROTO_SRC MALOS_PROTO_HEADER ../protocol-buffers/malos/driver.proto)
 
@@ -33,7 +35,6 @@ include_directories(
 
 set(malos_wakeword_src
   malos_wakeword.cpp
-  driver_manager.cpp driver_manager.h
   driver_wakeword.cpp driver_wakeword.h
   ${MALOS_PROTO_SRC} ${MALOS_PROTO_HEADER}
 )
