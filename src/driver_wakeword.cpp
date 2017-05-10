@@ -33,7 +33,7 @@ bool WakeWordDriver::ProcessConfig(const DriverConfig &config) {
   const int16_t channel = static_cast<int16_t>(wakeword_params.channel());
   wakeword = std::string("" + wakeword_params.wake_word());
   std::cout << "wakeword: " << wakeword << std::endl;
-  lm_path = std::string("" + wakeword_params.lm_path();
+  lm_path = std::string("" + wakeword_params.lm_path());
   std::cout << "lm_path: " << lm_path <<  std::endl;
   dic_path = std::string("" + wakeword_params.dic_path());
   std::cout << "dic_path: " << dic_path <<  std::endl;
