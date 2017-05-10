@@ -57,6 +57,9 @@ private:
   WakeWordParams wakeword_params_;
 
   std::string wakeword;
+  std::string lm_path;
+  std::string dic_path;
+  std::string actions_path;
 };
 
 } // namespace matrix_malos

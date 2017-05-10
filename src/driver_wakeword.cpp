@@ -14,6 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <cstring>
@@ -29,13 +30,21 @@ namespace matrix_malos {
 
 bool WakeWordDriver::ProcessConfig(const DriverConfig &config) {
   WakeWordParams wakeword_params(config.wakeword());
-  const int16_t mode = static_cast<int16_t>(wakeword_params.channel());
+  const int16_t channel = static_cast<int16_t>(wakeword_params.channel());
   wakeword = std::string("" + wakeword_params.wake_word());
-  std::cout << "wakeword: " << wakeword <<  std::endl;
-  std::string cmd =
-      std::string("psphix_wakeword -keyphrase \"" + wakeword +
-                  "\" -kws_threshold 1e-10 -inmic yes -adcdev mic_channel" +
-                  std::to_string(mode));
+  std::cout << "wakeword: " << wakeword << std::endl;
+  lm_path = std::string("" + wakeword_params.lm_path();
+  std::cout << "lm_path: " << lm_path <<  std::endl;
+  dic_path = std::string("" + wakeword_params.dic_path());
+  std::cout << "dic_path: " << dic_path <<  std::endl;
+  actions_path = std::string("" + wakeword_params.actions_path());
+  std::cout << "actions_path: " << actions_path <<  std::endl;
+
+  std::string cmd = std::string(
+                  "psphix_wakeword -keyphrase \"" + wakeword +
+                  "\" -kws_threshold 1e-20 -dict \"" + dic_path +
+                  "\" -lm \"" + lm_path + 
+                  "\" -inmic yes -adcdev mic_channel" + std::to_string(channel));
   std::cout << "cmd: " << cmd << std::endl;
 
   if (!(sphinx_pipe_ = popen(cmd.c_str(), "r"))) {
@@ -73,4 +82,4 @@ void WakeWordDriver::PocketSphinxProcess() {
 }
 
 bool WakeWordDriver::SendUpdate() { return true; }
-}
+}  // namespace matrix_malos
