@@ -45,21 +45,29 @@ public:
   // Send updates. Checks for new messages from WakeWord.
   bool SendUpdate() override;
 
-private:
   // Thread that read events from pocketsphinx
   void PocketSphinxProcess();
+
+  // Parameters loader
+  void loadParameters(WakeWordParams wakeword_params);
+
+  bool startPipe();
+
+  bool stopPipe();
 
 private:
   // pipe handler for pocketsphinx
   FILE *sphinx_pipe_;
 
-  // message used to store WakeWord and mic config
-  WakeWordParams wakeword_params_;
-
+  // config vars
   std::string wakeword;
   std::string lm_path;
   std::string dic_path;
   std::string actions_path;
+  int16_t channel=1; 
+
+  // service state
+  int state;
 };
 
 } // namespace matrix_malos

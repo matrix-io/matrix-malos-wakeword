@@ -28,9 +28,8 @@ namespace {}  // namespace
 
 namespace matrix_malos {
 
-bool WakeWordDriver::ProcessConfig(const DriverConfig &config) {
-  WakeWordParams wakeword_params(config.wakeword());
-  const int16_t channel = static_cast<int16_t>(wakeword_params.channel());
+void WakeWordDriver::loadParameters(WakeWordParams wakeword_params){
+  channel = static_cast<int16_t>(wakeword_params.channel());
   wakeword = std::string("" + wakeword_params.wake_word());
   std::cout << "wakeword: " << wakeword << std::endl;
   lm_path = std::string("" + wakeword_params.lm_path());
@@ -39,12 +38,14 @@ bool WakeWordDriver::ProcessConfig(const DriverConfig &config) {
   std::cout << "dic_path: " << dic_path <<  std::endl;
   actions_path = std::string("" + wakeword_params.actions_path());
   std::cout << "actions_path: " << actions_path <<  std::endl;
+}
 
+bool WakeWordDriver::startPipe(){
   std::string cmd = std::string(
-                  "psphix_wakeword -keyphrase \"" + wakeword +
-                  "\" -kws_threshold 1e-20 -dict \"" + dic_path +
-                  "\" -lm \"" + lm_path + 
-                  "\" -inmic yes -adcdev mic_channel" + std::to_string(channel));
+      "psphix_wakeword -keyphrase \"" + wakeword +
+      "\" -kws_threshold 1e-20 -dict \"" + dic_path +
+      "\" -lm \"" + lm_path + 
+      "\" -inmic yes -adcdev mic_channel" + std::to_string(channel));
   std::cout << "cmd: " << cmd << std::endl;
 
   if (!(sphinx_pipe_ = popen(cmd.c_str(), "r"))) {
@@ -56,6 +57,17 @@ bool WakeWordDriver::ProcessConfig(const DriverConfig &config) {
   pocketsphinx_thread.detach();
 
   return true;
+}
+
+bool WakeWordDriver::stopPipe(){
+  return true; 
+}
+
+bool WakeWordDriver::ProcessConfig(const DriverConfig &config) {
+  WakeWordParams wakeword_params(config.wakeword());
+  loadParameters(wakeword_params); 
+  stopPipe();
+  return startPipe();
 }
 
 void WakeWordDriver::PocketSphinxProcess() {
