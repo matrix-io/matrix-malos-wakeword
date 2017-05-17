@@ -38,8 +38,9 @@ function startWakeUpRecognition(){
   var wakeword_config = new matrixMalosBuilder.WakeWordParams;
   wakeword_config.set_wake_word("MATRIX");
   wakeword_config.set_channel(matrixMalosBuilder.WakeWordParams.MicChannel.channel0);
-  wakeword_config.set_lm_path("/home/pi/assets/67.lm");
-  wakeword_config.set_dic_path("/home/pi/assets/67.dic");
+  wakeword_config.set_lm_path("/home/pi/assets/6706.lm");
+  wakeword_config.set_dic_path("/home/pi/assets/6706.dic");
+  wakeword_config.set_enable_verbose(true)
   sendConfigProto(wakeword_config);
 }
 

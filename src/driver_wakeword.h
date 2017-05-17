@@ -64,6 +64,7 @@ private:
   int16_t channel = 1;
   // enable pipe processing
   bool enable = false;
+  bool verbose = false;
 };
 
 } // namespace matrix_malos
