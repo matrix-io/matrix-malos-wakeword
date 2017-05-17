@@ -55,16 +55,14 @@ public:
 private:
   // pipe handler for pocketsphinx
   FILE *sphinx_pipe_ = NULL; 
-
   // config vars
   std::string wakeword;
   std::string lm_path;
   std::string dic_path;
   std::string actions_path;
-  int16_t channel=1; 
-
-  // service state
-  int state;
+  int16_t channel=1;
+  // enable pipe processing
+  bool enable = false;
 };
 
 } // namespace matrix_malos

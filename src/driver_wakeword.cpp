@@ -29,8 +29,6 @@ namespace {}  // namespace
 
 namespace matrix_malos {
 
-bool enable = false;
-
 bool WakeWordDriver::ProcessConfig(const DriverConfig &config) {
   stopPipe();
   WakeWordParams wakeword_params(config.wakeword());
