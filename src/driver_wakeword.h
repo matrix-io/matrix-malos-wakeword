@@ -53,6 +53,8 @@ private:
 
   void returnMatch(std::string match);
 
+  bool validatePaths();
+
   // pipe handler for pocketsphinx
   FILE *sphinx_pipe_ = NULL;
   // config vars

@@ -21,6 +21,7 @@
 #include <iostream>
 #include <unistd.h>
 #include <string>
+#include <sys/stat.h>
 
 #include "./driver_wakeword.h"
 #include "./src/driver.pb.h"
@@ -28,6 +29,11 @@
 namespace {}  // namespace
 
 namespace matrix_malos {
+
+inline bool exists_path (const std::string& name) {
+  struct stat buffer;   
+  return (stat (name.c_str(), &buffer) == 0); 
+}
 
 bool WakeWordDriver::ProcessConfig(const DriverConfig &config) {
   stopPipe();
@@ -37,8 +43,14 @@ bool WakeWordDriver::ProcessConfig(const DriverConfig &config) {
     return true;
   }
   loadParameters(wakeword_params);
-  enable = startPipe();
-  return enable;
+  if(validatePaths()){
+    enable = startPipe();
+    return enable;
+  }
+  else {
+    zmq_push_error_->Send("invalid configuration paths");
+    return false;
+  }
 }
 
 void WakeWordDriver::loadParameters(WakeWordParams wakeword_params) {
@@ -108,6 +120,12 @@ void WakeWordDriver::returnMatch(std::string match) {
   std::string buffer;
   wakewordUpdate.SerializeToString(&buffer);
   zqm_push_update_->Send(buffer);
+}
+
+bool WakeWordDriver::validatePaths(){
+  if(!exists_path(dic_path))return false;
+  if(!exists_path(lm_path))return false;
+  return true;
 }
 
 }  // namespace matrix_malos

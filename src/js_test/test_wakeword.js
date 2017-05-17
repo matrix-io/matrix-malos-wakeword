@@ -20,17 +20,26 @@ var matrixMalosBuilder = protoBuilder.build("matrix_malos");
 var configSocket = zmq.socket('push')
 configSocket.connect('tcp://' + creator_ip + ':' + creator_wakeword_base_port /* config */)
 
-/**
- * startWakeUpRecognition
- */
+// ********** Start error management.
+var errorSocket = zmq.socket('sub')
+errorSocket.connect('tcp://' + creator_ip + ':' + (creator_wakeword_base_port + 2))
+errorSocket.subscribe('')
+errorSocket.on('message', function(error_message) {
+  process.stdout.write('Received Wakeword error: ' + error_message.toString('utf8') + "\n")
+});
+// ********** End error management.
+
+/**************************************
+ * start/stop service functions
+ **************************************/
 
 function startWakeUpRecognition(){
   console.log('<== config wakeword recognition..')
   var wakeword_config = new matrixMalosBuilder.WakeWordParams;
   wakeword_config.set_wake_word("MATRIX");
   wakeword_config.set_channel(matrixMalosBuilder.WakeWordParams.MicChannel.channel0);
-  wakeword_config.set_lm_path("/home/pi/assets/6706.lm");
-  wakeword_config.set_dic_path("/home/pi/assets/6706.dic");
+  wakeword_config.set_lm_path("/home/pi/assets/67.lm");
+  wakeword_config.set_dic_path("/home/pi/assets/67.dic");
   sendConfigProto(wakeword_config);
 }
 
@@ -41,10 +50,9 @@ function stopWakeUpRecognition(){
   sendConfigProto(wakeword_config);
 }
 
-/**
- * Register wakeword recognition callbacks
- *
- */
+/**************************************
+ * Register wakeword callbacks
+ **************************************/
 
 var updateSocket = zmq.socket('sub')
 updateSocket.connect('tcp://' + creator_ip + ':' + (creator_wakeword_base_port + 3))
@@ -55,13 +63,9 @@ updateSocket.on('message', function(wakeword_buffer) {
   console.log('==> WakeWord Reached:',wakeWordData.wake_word)
 });
 
-/**
+/**************************************
  * sendConfigProto: build Proto message 
- * and send it.
- *
- * Params:
- * cfg: proto message
- */
+ **************************************/
 
 function sendConfigProto(cfg){
   var config = new matrixMalosBuilder.DriverConfig
@@ -75,6 +79,6 @@ function sendConfigProto(cfg){
 
 startWakeUpRecognition();
 
-setTimeout(function() {
-  stopWakeUpRecognition()
-}, 10000);
+//setTimeout(function() {
+//  stopWakeUpRecognition()
+//}, 10000);
