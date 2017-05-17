@@ -10,7 +10,7 @@
 // BasePort + 2 => Error port. Receive errros from device.
 // BasePort + 3 => Data port. Receive data from device.
 
-var creator_ip = '10.0.0.175';
+var creator_ip = '127.0.0.1';
 var creator_wakeword_base_port = 60001;
 var protoBuf = require("protobufjs");
 var zmq = require('zmq');
@@ -40,7 +40,7 @@ function startWakeUpRecognition(){
   wakeword_config.set_channel(matrixMalosBuilder.WakeWordParams.MicChannel.channel0);
   wakeword_config.set_lm_path("/home/pi/assets/6706.lm");
   wakeword_config.set_dic_path("/home/pi/assets/6706.dic");
-  wakeword_config.set_enable_verbose(true)
+  wakeword_config.set_enable_verbose(false)
   sendConfigProto(wakeword_config);
 }
 
