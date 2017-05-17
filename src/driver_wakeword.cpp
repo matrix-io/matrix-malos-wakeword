@@ -19,6 +19,7 @@
 #include <stdlib.h>
 #include <cstring>
 #include <iostream>
+#include <unistd.h>
 #include <string>
 
 #include "./driver_wakeword.h"
@@ -28,11 +29,14 @@ namespace {}  // namespace
 
 namespace matrix_malos {
 
+bool enable = false;
+
 bool WakeWordDriver::ProcessConfig(const DriverConfig &config) {
+  stopPipe();
   WakeWordParams wakeword_params(config.wakeword());
   loadParameters(wakeword_params);
-  stopPipe();
-  return startPipe();
+  enable = startPipe();
+  return enable;
 }
 
 void WakeWordDriver::loadParameters(WakeWordParams wakeword_params) {
@@ -54,7 +58,7 @@ bool WakeWordDriver::startPipe() {
                   lm_path + "\" -inmic yes -adcdev mic_channel" +
                   std::to_string(channel) + " 2> /dev/null");
 
-  std::cout << "Starting PocketSphinxProcess thread.." << std::endl;
+  std::cout << "Starting PocketSphinx thread.." << std::endl;
   if (!(sphinx_pipe_ = popen(cmd.c_str(), "r"))) {
     return false;
   }
@@ -65,16 +69,25 @@ bool WakeWordDriver::startPipe() {
   return true;
 }
 
-bool WakeWordDriver::stopPipe() { return true; }
+bool WakeWordDriver::stopPipe() {
+  if (sphinx_pipe_ != NULL && enable) {
+    enable = false;
+    std::cout << "Stoping PocketSphinx thread.." << std::endl;
+    if (system(std::string("killall psphix_wakeword").c_str()) == -1) {
+      return false;
+    }
+    sleep(2);
+  }
+  return true;
+}
 
 void WakeWordDriver::PocketSphinxProcess() {
   char buff[512];
   char match[100];
   snprintf(match, sizeof(match), "match: %s", wakeword.c_str());
-  std::string matchAsStdStr = match;
 
   // processing pipe output
-  while (fgets(buff, sizeof(buff), sphinx_pipe_) != NULL) {
+  while (fgets(buff, sizeof(buff), sphinx_pipe_) != NULL && enable) {
     std::string sbuff = buff;
     std::size_t found = sbuff.find(match);
     if (found != std::string::npos) {

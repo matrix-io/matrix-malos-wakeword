@@ -29,8 +29,6 @@ const char kWakeWordDriverName[] = "WakeWord";
 
 namespace matrix_malos {
 
-// FIXME: inherit from malos_base.h
-
 class WakeWordDriver : public MalosBase {
 public:
   WakeWordDriver() : MalosBase(kWakeWordDriverName) {
@@ -56,7 +54,7 @@ public:
 
 private:
   // pipe handler for pocketsphinx
-  FILE *sphinx_pipe_;
+  FILE *sphinx_pipe_ = NULL; 
 
   // config vars
   std::string wakeword;
