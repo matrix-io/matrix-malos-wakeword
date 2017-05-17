@@ -32,6 +32,10 @@ namespace matrix_malos {
 bool WakeWordDriver::ProcessConfig(const DriverConfig &config) {
   stopPipe();
   WakeWordParams wakeword_params(config.wakeword());
+  if(wakeword_params.stop_recognition()){
+    std::cout << "==> disable wakeword service.." << std::endl;
+    return true;
+  }
   loadParameters(wakeword_params);
   enable = startPipe();
   return enable;
@@ -40,10 +44,10 @@ bool WakeWordDriver::ProcessConfig(const DriverConfig &config) {
 void WakeWordDriver::loadParameters(WakeWordParams wakeword_params) {
   channel = static_cast<int16_t>(wakeword_params.channel());
   wakeword = std::string("" + wakeword_params.wake_word());
-  std::cout << "==> wakeword: " << wakeword << std::endl;
   lm_path = std::string("" + wakeword_params.lm_path());
-  std::cout << "==> lenguaje path: " << lm_path <<  std::endl;
   dic_path = std::string("" + wakeword_params.dic_path());
+  std::cout << "==> wakeword: " << wakeword << std::endl;
+  std::cout << "==> lenguaje path: " << lm_path <<  std::endl;
   std::cout << "==> dictionary path: " << dic_path <<  std::endl;
 }
 
