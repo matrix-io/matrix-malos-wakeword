@@ -34,13 +34,14 @@ public:
   WakeWordDriver() : MalosBase(kWakeWordDriverName) {
     SetNeedsKeepalives(true);
     SetMandatoryConfiguration(true);
-    SetNotesForHuman("WakeWord Driver v0.1");
+    SetNotesForHuman("WakeWord Driver v0.1.2");
   }
 
   // Read configuration from the outside workd.
   bool ProcessConfig(const DriverConfig &config) override;
 
-    // Thread that read events from pocketsphinx
+private:
+  // Thread that read events from pocketsphinx
   void PocketSphinxProcess();
 
   // Parameters loader
@@ -52,15 +53,13 @@ public:
 
   void returnMatch(std::string match);
 
-private:
   // pipe handler for pocketsphinx
-  FILE *sphinx_pipe_ = NULL; 
+  FILE *sphinx_pipe_ = NULL;
   // config vars
   std::string wakeword;
   std::string lm_path;
   std::string dic_path;
-  std::string actions_path;
-  int16_t channel=1;
+  int16_t channel = 1;
   // enable pipe processing
   bool enable = false;
 };

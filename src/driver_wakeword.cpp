@@ -45,8 +45,6 @@ void WakeWordDriver::loadParameters(WakeWordParams wakeword_params) {
   std::cout << "==> lenguaje path: " << lm_path <<  std::endl;
   dic_path = std::string("" + wakeword_params.dic_path());
   std::cout << "==> dictionary path: " << dic_path <<  std::endl;
-  actions_path = std::string("" + wakeword_params.actions_path());
-  std::cout << "==> actions path: " << actions_path <<  std::endl;
 }
 
 bool WakeWordDriver::startPipe() {
