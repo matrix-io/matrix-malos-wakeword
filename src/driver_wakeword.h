@@ -42,10 +42,7 @@ public:
   // Read configuration from the outside workd.
   bool ProcessConfig(const DriverConfig &config) override;
 
-  // Send updates. Checks for new messages from WakeWord.
-  bool SendUpdate() override;
-
-  // Thread that read events from pocketsphinx
+    // Thread that read events from pocketsphinx
   void PocketSphinxProcess();
 
   // Parameters loader
@@ -54,6 +51,8 @@ public:
   bool startPipe();
 
   bool stopPipe();
+
+  void returnMatch(std::string match);
 
 private:
   // pipe handler for pocketsphinx

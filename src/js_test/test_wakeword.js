@@ -28,9 +28,9 @@ function startWakeUpRecognition(){
   var wakeword_config = new matrixMalosBuilder.WakeWordParams;
   wakeword_config.set_wake_word("MATRIX");
   wakeword_config.set_channel(matrixMalosBuilder.WakeWordParams.MicChannel.channel0);
-  wakeword_config.set_lm_path("/home/pi/assets/6706.lm");
-  wakeword_config.set_dic_path("/home/pi/assets/6706.dic");
-  wakeword_config.set_actions_path("/home/pi/assets/matrix_commands.txt");
+  wakeword_config.set_lm_path("/home/pi/assets/1636.lm");
+  wakeword_config.set_dic_path("/home/pi/assets/1636.dic");
+  wakeword_config.set_actions_path("/home/pi/assets/matrix_commands_1636.txt");
   sendConfigProto(wakeword_config);
 }
 
@@ -41,7 +41,7 @@ updateSocket.subscribe('')
 
 updateSocket.on('message', function(wakeword_buffer) {
   var wakeWordData = new matrixMalosBuilder.WakeWordParams.decode(wakeword_buffer)
-  console.log('<== WakeWord Reached!',wakeWordData.wake_word)
+  console.log('<== WakeWord Reached:',wakeWordData.wake_word)
 });
 
 /**

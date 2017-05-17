@@ -28,30 +28,36 @@ namespace {}  // namespace
 
 namespace matrix_malos {
 
-void WakeWordDriver::loadParameters(WakeWordParams wakeword_params){
-  channel = static_cast<int16_t>(wakeword_params.channel());
-  wakeword = std::string("" + wakeword_params.wake_word());
-  std::cout << "wakeword: " << wakeword << std::endl;
-  lm_path = std::string("" + wakeword_params.lm_path());
-  std::cout << "lm_path: " << lm_path <<  std::endl;
-  dic_path = std::string("" + wakeword_params.dic_path());
-  std::cout << "dic_path: " << dic_path <<  std::endl;
-  actions_path = std::string("" + wakeword_params.actions_path());
-  std::cout << "actions_path: " << actions_path <<  std::endl;
+bool WakeWordDriver::ProcessConfig(const DriverConfig &config) {
+  WakeWordParams wakeword_params(config.wakeword());
+  loadParameters(wakeword_params);
+  stopPipe();
+  return startPipe();
 }
 
-bool WakeWordDriver::startPipe(){
-  std::string cmd = std::string(
-      "psphix_wakeword -keyphrase \"" + wakeword +
-      "\" -kws_threshold 1e-20 -dict \"" + dic_path +
-      "\" -lm \"" + lm_path + 
-      "\" -inmic yes -adcdev mic_channel" + std::to_string(channel));
-  std::cout << "cmd: " << cmd << std::endl;
+void WakeWordDriver::loadParameters(WakeWordParams wakeword_params) {
+  channel = static_cast<int16_t>(wakeword_params.channel());
+  wakeword = std::string("" + wakeword_params.wake_word());
+  std::cout << "==> wakeword: " << wakeword << std::endl;
+  lm_path = std::string("" + wakeword_params.lm_path());
+  std::cout << "==> lenguaje path: " << lm_path <<  std::endl;
+  dic_path = std::string("" + wakeword_params.dic_path());
+  std::cout << "==> dictionary path: " << dic_path <<  std::endl;
+  actions_path = std::string("" + wakeword_params.actions_path());
+  std::cout << "==> actions path: " << actions_path <<  std::endl;
+}
 
+bool WakeWordDriver::startPipe() {
+  std::string cmd =
+      std::string("./psphix_wakeword -keyphrase \"" + wakeword +
+                  "\" -kws_threshold 1e-20 -dict \"" + dic_path + "\" -lm \"" +
+                  lm_path + "\" -inmic yes -adcdev mic_channel" +
+                  std::to_string(channel) + " 2> /dev/null");
+
+  std::cout << "Starting PocketSphinxProcess thread.." << std::endl;
   if (!(sphinx_pipe_ = popen(cmd.c_str(), "r"))) {
     return false;
   }
-
   // alsa thread.
   std::thread pocketsphinx_thread(&WakeWordDriver::PocketSphinxProcess, this);
   pocketsphinx_thread.detach();
@@ -59,39 +65,36 @@ bool WakeWordDriver::startPipe(){
   return true;
 }
 
-bool WakeWordDriver::stopPipe(){
-  return true; 
-}
-
-bool WakeWordDriver::ProcessConfig(const DriverConfig &config) {
-  WakeWordParams wakeword_params(config.wakeword());
-  loadParameters(wakeword_params); 
-  stopPipe();
-  return startPipe();
-}
+bool WakeWordDriver::stopPipe() { return true; }
 
 void WakeWordDriver::PocketSphinxProcess() {
   char buff[512];
+  char match[100];
+  snprintf(match, sizeof(match), "match: %s", wakeword.c_str());
+  std::string matchAsStdStr = match;
 
-  char matchbuff[100];
-  snprintf(matchbuff, sizeof(matchbuff), "match: %s\n", wakeword.c_str());
-  std::string matchAsStdStr = matchbuff;
-
-  std::cout << "PocketSphinxProcess thread" << std::endl;
+  // processing pipe output
   while (fgets(buff, sizeof(buff), sphinx_pipe_) != NULL) {
-    std::cout << buff << std::endl;
-    if (std::strcmp(buff, matchbuff) == 0) {
-      std::cout << "sending ZMQ push.." << std::endl;
-      WakeWordParams wakewordUpdate;
-      wakewordUpdate.set_wake_word(wakeword);
-      std::string buffer;
-      wakewordUpdate.SerializeToString(&buffer);
-      zqm_push_update_->Send(buffer);
+    std::string sbuff = buff;
+    std::size_t found = sbuff.find(match);
+    if (found != std::string::npos) {
+      std::cout << "[SEND] recognition " << sbuff;
+      sbuff = sbuff.substr(sbuff.find_first_of(" \t") + 1);
+      sbuff = sbuff.erase(sbuff.length() - 1);
+      returnMatch(sbuff);
+    } else {
+      std::cout << "[SKIP] recognition " << sbuff;
     }
   }
-
   pclose(sphinx_pipe_);
 }
 
-bool WakeWordDriver::SendUpdate() { return true; }
+void WakeWordDriver::returnMatch(std::string match) {
+  WakeWordParams wakewordUpdate;
+  wakewordUpdate.set_wake_word(match);
+  std::string buffer;
+  wakewordUpdate.SerializeToString(&buffer);
+  zqm_push_update_->Send(buffer);
+}
+
 }  // namespace matrix_malos
