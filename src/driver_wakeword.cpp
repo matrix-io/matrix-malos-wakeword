@@ -49,7 +49,7 @@ void WakeWordDriver::loadParameters(WakeWordParams wakeword_params) {
 
 bool WakeWordDriver::startPipe() {
   std::string cmd =
-      std::string("./psphix_wakeword -keyphrase \"" + wakeword +
+      std::string("./malos_psphinx -keyphrase \"" + wakeword +
                   "\" -kws_threshold 1e-20 -dict \"" + dic_path + "\" -lm \"" +
                   lm_path + "\" -inmic yes -adcdev mic_channel" +
                   std::to_string(channel) + " 2> /dev/null");
@@ -69,7 +69,7 @@ bool WakeWordDriver::stopPipe() {
   if (sphinx_pipe_ != NULL && enable) {
     enable = false;
     std::cout << "Stoping PocketSphinx thread.." << std::endl;
-    if (system(std::string("killall psphix_wakeword").c_str()) == -1) {
+    if (system(std::string("killall malos_psphinx").c_str()) == -1) {
       return false;
     }
     sleep(2);
