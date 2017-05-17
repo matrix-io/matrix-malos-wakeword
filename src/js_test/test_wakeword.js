@@ -31,7 +31,6 @@ function startWakeUpRecognition(){
   wakeword_config.set_channel(matrixMalosBuilder.WakeWordParams.MicChannel.channel0);
   wakeword_config.set_lm_path("/home/pi/assets/1636.lm");
   wakeword_config.set_dic_path("/home/pi/assets/1636.dic");
-  wakeword_config.set_actions_path("/home/pi/assets/matrix_commands_1636.txt");
   sendConfigProto(wakeword_config);
 }
 
