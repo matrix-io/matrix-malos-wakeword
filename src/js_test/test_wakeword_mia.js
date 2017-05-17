@@ -25,7 +25,7 @@ configSocket.connect('tcp://' + creator_ip + ':' + creator_wakeword_base_port /*
  */
 
 function startWakeUpRecognition(){
-  console.log('<== start wakeword recognition..')
+  console.log('<== config wakeword recognition..')
   var wakeword_config = new matrixMalosBuilder.WakeWordParams;
   wakeword_config.set_wake_word("MIA");
   wakeword_config.set_channel(matrixMalosBuilder.WakeWordParams.MicChannel.channel0);
