@@ -194,7 +194,7 @@ updateSocket.on('message', function(wakeword_buffer) {
   matrix stop
   matrix ipaddress
   matrix ring red
-  matrix reng green
+  matrix ring green
   matrix game time
   matrix five minutes
   matrix ten seconds
