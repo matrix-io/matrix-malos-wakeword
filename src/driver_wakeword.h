@@ -37,34 +37,48 @@ public:
     SetNotesForHuman("WakeWord Driver v0.1.2");
   }
 
-  // Read configuration from the outside workd.
+  // Reads configuration from the outside workd.
   bool ProcessConfig(const DriverConfig &config) override;
 
 private:
-  // Thread that read events from pocketsphinx
+  // Thread that read events from malos_psphinx command
   void PocketSphinxProcess();
 
+  // Reads config parameters from proto
   void loadParameters(WakeWordParams wakeword_params);
 
+  // Starts malos_psphinx thread
   bool startPipe();
 
+  // Kills malos_psphinx thread
   bool stopPipe();
 
+  // Sends via zmq_push voice commands found
   void returnMatch(std::string match);
 
+  // Validates language and dictionary paths
   bool validatePaths();
 
-  inline bool exists_path(const std::string &name);
-
-  // pipe handler for pocketsphinx
+  // Pipe handler for pocketsphinx
   FILE *sphinx_pipe_ = NULL;
-  // config vars
+
+  // sets main wakeword parameter, like "MATRIX"
   std::string wakeword;
+
+  // sets language models path
   std::string lm_path;
+
+  // sets dictionary models path
   std::string dic_path;
-  int16_t channel = 1;
-  // enable pipe processing
-  bool enable = false;
+
+  // sets microphone channel (0-8)
+  // 0-7 individual mic, 8 all mics on the same time
+  int16_t channel = 8;
+
+  // sets enable/disable voice detection service
+  bool enabled = false;
+
+  // sets pocketsphinx verbose output
   bool verbose = false;
 };
 
