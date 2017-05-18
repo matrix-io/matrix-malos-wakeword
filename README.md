@@ -43,7 +43,7 @@ sudo apt-get install nodejs
 
 ## Run sample DEMO
 
-Before, copy on your RaspberryPi language models and dictionary for run the DEMO or generated
+First, copy on your RaspberryPi language models and dictionary for run the DEMO or generated
 them (see section: Custom language and phrases for recognition)
 
 ``` javascript
