@@ -66,16 +66,16 @@ updateSocket.on('message', function(wakeword_buffer) {
     
     switch(wakeWordData.wake_word) {
       case "MIA RING RED":
-        setEverloop(255, 0, 25, 0, 0.01)
+        setEverloop(255, 0, 25, 0, 0.05)
         break;
       case "MIA RING BLUE":
-        setEverloop(0, 25, 255, 0, 0.01) 
+        setEverloop(0, 25, 255, 0, 0.05) 
         break;
       case "MIA RING GREEN":
-        setEverloop(0, 255, 100, 0, 0.01) 
+        setEverloop(0, 255, 100, 0, 0.05) 
         break;
       case "MIA RING ORANGE":
-        setEverloop(255, 77, 0, 0, 0.01) 
+        setEverloop(255, 77, 0, 0, 0.05) 
         break;
       case "MIA RING CLEAR":
         setEverloop(0, 0, 0, 0, 0) 

@@ -1,50 +1,68 @@
 
-# Pre-Requisites
-```
-echo "deb http://packages.matrix.one/matrix-creator/ ./" | sudo tee --append /etc/apt/sources.list;
-sudo apt-get update;
-sudo apt-get upgrade;
-sudo apt-get install libzmq3-dev cmake g++ git;
-```
+# MATRIX Creator MALOS-Wakeword
 
-### Install
-```
-sudo apt-get install matrix-creator-init matrix-creator-malos matrix-malos-wakeword
-sudo reboot
-```
+Wakeword voice service for MALOS. The last version support:
 
-**Note:** At this point, on next start, `malos` and `malos-wakeword` will be running as a service.
+* setup wakeword
+* define lenguaje models path (pre-generated)
+* define lenguaje dictionary path (pre-generated)
+* define mic number (0-8)
+* enable/disable pocketsphinx verbose debugging 
+* send and override configuration (hot-plug)
+* disable voice recognition service (stop pshinx main thread)
 
 
-### Examples
-**Note:** pre-requisite is NodeJS. Don't use the one shipped with Raspbian because it's a bit old. If you don't have it, please check a recipe included below.
-```
-git clone https://github.com/matrix-io/matrix-malos-wakeword.git && cd matrix-malos-wakeword
-git submodule init && git submodule update
-cd src/js_test
-
-
-// uv index, uv range
-node test_wakeword.js
-```
+## Installation
 -------------------------
 
-### NodeJS Dependency
+### Raspbian Dependencies 
 
-For instance (in the Raspberry):
+Before, please install MALOS on your RaspberryPi3 and perform device reboot. For more details: [Getting Started Guide](https://github.com/matrix-io/matrix-creator-quickstart/wiki/2.-Getting-Started)
 
+``` javascript
+echo "deb http://packages.matrix.one/matrix-creator/ ./" | sudo tee --append /etc/apt/sources.list
+sudo apt-get update
+sudo apt-get upgrade
+sudo apt-get install matrix-creator-init matrix-creator-malos cmake g++ git libzmq3-dev --no-install-recommends
+reboot
 ```
-# Install npm (doesn't really matter what version, apt-get node is v0.10...)
-sudo apt-get install npm
 
-# n is a node version manager
-sudo npm install -g n
+Add some dependencies and pocketsphinx package:
 
-# node 6.5 is the latest target node version, also installs new npm
-n 6.5
+``` javascript
+echo "deb http://unstable-packages.matrix.one/ stable main" | sudo tee -a /etc/apt/sources.list
+sudo apt-get update
+sudo apt-get install matrix-creator-malos-wakeword --no-install-recommends
+```
 
-# check version
-node -v
+Nodejs and npm on RaspberryPi:
+
+``` javascript
+curl -sL https://deb.nodesource.com/setup_6.x | sudo bash -
+sudo apt-get install nodejs
+```
+
+## Usage
+
+Before, copy on your RaspberryPi lengueaje models and dictionary for run the DEMO or generated
+them (see section, generating models)
+
+``` javascript
+cd /home/pi
+git clone --recursive https://github.com/matrix-io/matrix-malos-wakeword.git
+cp -r matrix-malos-wakeword/assets .
+```
+
+### Run sample DEMO
+
+Run nodejs example and say it some voice commands: `mia ring red`, `mia ring
+orange`, mia ring clear` for example:
+
+``` javascript
+cd matrix-malos-wakeword
+git submodule init && git submodule update
+cd src/js_test
+node test_wakeword.js
 ```
 
 
