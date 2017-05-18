@@ -26,7 +26,13 @@
 #include "./driver_wakeword.h"
 #include "./src/driver.pb.h"
 
-namespace {}  // namespace
+namespace {
+
+inline bool WakeWordDriver::exists_path(const std::string &name) {
+  struct stat buffer;
+  return (stat(name.c_str(), &buffer) == 0);
+}
+}  // namespace
 
 namespace matrix_malos {
 
@@ -34,14 +40,14 @@ bool WakeWordDriver::ProcessConfig(const DriverConfig &config) {
   stopPipe();
   WakeWordParams wakeword_params(config.wakeword());
   if (wakeword_params.stop_recognition()) {
-    std::cout << "==> disable wakeword service.." << std::endl;
+    std::cerr << "==> disable wakeword service.." << std::endl;
     return true;
   }
   loadParameters(wakeword_params);
   if (validatePaths()) {
     verbose = wakeword_params.enable_verbose();
-    enable = startPipe();
-    return enable;
+    enabled = startPipe();
+    return enabled;
   } else {
     zmq_push_error_->Send("invalid configuration paths");
     return false;
@@ -53,9 +59,9 @@ void WakeWordDriver::loadParameters(WakeWordParams wakeword_params) {
   wakeword = std::string("" + wakeword_params.wake_word());
   lm_path = std::string("" + wakeword_params.lm_path());
   dic_path = std::string("" + wakeword_params.dic_path());
-  std::cout << "==> wakeword: " << wakeword << std::endl;
-  std::cout << "==> lenguaje path: " << lm_path << std::endl;
-  std::cout << "==> dictionary path: " << dic_path << std::endl;
+  std::cerr << "==> wakeword: " << wakeword << std::endl;
+  std::cerr << "==> lenguaje path: " << lm_path << std::endl;
+  std::cerr << "==> dictionary path: " << dic_path << std::endl;
 }
 
 bool WakeWordDriver::startPipe() {
@@ -80,13 +86,13 @@ bool WakeWordDriver::startPipe() {
 }
 
 bool WakeWordDriver::stopPipe() {
-  if (sphinx_pipe_ != NULL && enable) {
-    enable = false;
+  if (sphinx_pipe_ != NULL && enabled) {
+    enabled = false;
     std::cout << "Stoping PocketSphinx thread.." << std::endl;
-    if (system(std::string("killall malos_psphinx").c_str()) == -1) {
+    if (system("killall malos_psphinx") == -1) {
       return false;
     }
-    sleep(2);
+    sleep(1);  // for possible conflict with startPipe on config
   }
   return true;
 }
@@ -97,16 +103,15 @@ void WakeWordDriver::PocketSphinxProcess() {
   snprintf(match, sizeof(match), "match: %s", wakeword.c_str());
 
   // processing pipe output
-  while (fgets(buff, sizeof(buff), sphinx_pipe_) != NULL && enable) {
+  while (fgets(buff, sizeof(buff), sphinx_pipe_) != NULL && enabled) {
     std::string sbuff = buff;
-    std::size_t found = sbuff.find(match);
-    if (found != std::string::npos) {
-      std::cout << "[SEND] recognition " << sbuff;
+    if (sbuff.find(match) != std::string::npos) {
+      std::cerr << "[SEND] recognition " << sbuff;
       sbuff = sbuff.substr(sbuff.find_first_of(" \t") + 1);
       sbuff = sbuff.erase(sbuff.length() - 1);
       returnMatch(sbuff);
     } else {
-      std::cout << "[SKIP] recognition " << sbuff;
+      std::cerr << "[SKIP] recognition " << sbuff;
     }
   }
   pclose(sphinx_pipe_);
@@ -126,11 +131,6 @@ bool WakeWordDriver::validatePaths() {
   if (!exists_path(lm_path))
     return false;
   return true;
-}
-
-inline bool WakeWordDriver::exists_path(const std::string &name) {
-  struct stat buffer;
-  return (stat(name.c_str(), &buffer) == 0);
 }
 
 }  // namespace matrix_malos
