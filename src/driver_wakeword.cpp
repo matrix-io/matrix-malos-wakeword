@@ -60,7 +60,7 @@ void WakeWordDriver::loadParameters(WakeWordParams wakeword_params) {
 
 bool WakeWordDriver::startPipe() {
   std::string cmd = std::string(
-      "./malos_psphinx -keyphrase \"" + wakeword +
+      "malos_psphinx -keyphrase \"" + wakeword +
       "\" -kws_threshold 1e-20 -dict \"" + dic_path + "\" -lm \"" + lm_path +
       "\" -inmic yes -adcdev mic_channel" + std::to_string(channel));
 
