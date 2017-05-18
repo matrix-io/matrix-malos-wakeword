@@ -1,0 +1,55 @@
+Language model created by QuickLM on Thu May 18 00:44:08 EDT 2017
+Copyright (c) 1996-2010 Carnegie Mellon University and Alexander I. Rudnicky
+
+The model is in standard ARPA format, designed by Doug Paul while he was at MITRE.
+
+The code that was used to produce this language model is available in Open Source.
+Please visit http://www.speech.cs.cmu.edu/tools/ for more information
+
+The (fixed) discount mass is 0.5. The backoffs are computed using the ratio method.
+This model based on a corpus of 5 sentences and 9 words
+
+\data\
+ngram 1=9
+ngram 2=12
+ngram 3=11
+
+\1-grams:
+-1.0000 </s> -0.3010
+-1.0000 <s> -0.2553
+-1.6990 BLUE -0.2553
+-1.6990 CLEAR -0.2553
+-1.6990 GREEN -0.2553
+-1.0000 MIA -0.2553
+-1.6990 ORANGE -0.2553
+-1.6990 RED -0.2553
+-1.0000 RING -0.2553
+
+\2-grams:
+-0.3010 <s> MIA 0.0000
+-0.3010 BLUE </s> -0.3010
+-0.3010 CLEAR </s> -0.3010
+-0.3010 GREEN </s> -0.3010
+-0.3010 MIA RING 0.0000
+-0.3010 ORANGE </s> -0.3010
+-0.3010 RED </s> -0.3010
+-1.0000 RING BLUE 0.0000
+-1.0000 RING CLEAR 0.0000
+-1.0000 RING GREEN 0.0000
+-1.0000 RING ORANGE 0.0000
+-1.0000 RING RED 0.0000
+
+\3-grams:
+-0.3010 <s> MIA RING
+-1.0000 MIA RING BLUE
+-1.0000 MIA RING CLEAR
+-1.0000 MIA RING GREEN
+-1.0000 MIA RING ORANGE
+-1.0000 MIA RING RED
+-0.3010 RING BLUE </s>
+-0.3010 RING CLEAR </s>
+-0.3010 RING GREEN </s>
+-0.3010 RING ORANGE </s>
+-0.3010 RING RED </s>
+
+\end\
