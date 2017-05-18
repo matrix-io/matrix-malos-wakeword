@@ -44,7 +44,7 @@ sudo apt-get install nodejs
 ## Run sample DEMO
 
 Before, copy on your RaspberryPi lengueaje models and dictionary for run the DEMO or generated
-them (see section, generating models)
+them (see section: Custom lenguage and phrases for recognition)
 
 ``` javascript
 cd /home/pi
@@ -188,7 +188,27 @@ updateSocket.on('message', function(wakeword_buffer) {
 
 ```
 
+## Custom lenguage and phrases for recognition 
 
++ Make a text plane like this: 
+``` 
+matrix everloop
+matrix clear
+matrix stop
+matrix ipaddress
+matrix game time
+matrix one minute
+matrix two minutes
+matrix three minutes
+matrix four minutes
+matrix five minutes
+matrix ten seconds
+matrix ten minutes
+```
+
++ Upload this file to [Sphinx Knowledge Base Tool](http://www.speech.cs.cmu.edu/tools/lmtool-new.html) and compile knowledge base.
+
++ Dowload *TARXXXXX.tgz* and upgrade assets: 
 
 
 
