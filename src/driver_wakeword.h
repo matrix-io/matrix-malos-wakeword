@@ -44,7 +44,6 @@ private:
   // Thread that read events from pocketsphinx
   void PocketSphinxProcess();
 
-  // Parameters loader
   void loadParameters(WakeWordParams wakeword_params);
 
   bool startPipe();
@@ -54,6 +53,8 @@ private:
   void returnMatch(std::string match);
 
   bool validatePaths();
+
+  inline bool exists_path(const std::string &name);
 
   // pipe handler for pocketsphinx
   FILE *sphinx_pipe_ = NULL;

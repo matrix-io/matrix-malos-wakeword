@@ -30,11 +30,6 @@ namespace {}  // namespace
 
 namespace matrix_malos {
 
-inline bool exists_path(const std::string &name) {
-  struct stat buffer;
-  return (stat(name.c_str(), &buffer) == 0);
-}
-
 bool WakeWordDriver::ProcessConfig(const DriverConfig &config) {
   stopPipe();
   WakeWordParams wakeword_params(config.wakeword());
@@ -79,6 +74,7 @@ bool WakeWordDriver::startPipe() {
   // alsa thread.
   std::thread pocketsphinx_thread(&WakeWordDriver::PocketSphinxProcess, this);
   pocketsphinx_thread.detach();
+  returnMatch("voice recognition ready");
 
   return true;
 }
@@ -130,6 +126,11 @@ bool WakeWordDriver::validatePaths() {
   if (!exists_path(lm_path))
     return false;
   return true;
+}
+
+inline bool WakeWordDriver::exists_path(const std::string &name) {
+  struct stat buffer;
+  return (stat(name.c_str(), &buffer) == 0);
 }
 
 }  // namespace matrix_malos
