@@ -4,8 +4,8 @@
 Wakeword voice service for MALOS. The last version support:
 
 * setup wakeword
-* define lenguaje models path (pre-generated)
-* define lenguaje dictionary path (pre-generated)
+* define language models path (pre-generated)
+* define language dictionary path (pre-generated)
 * define mic number (0-8)
 * enable/disable pocketsphinx verbose debugging 
 * send and override configuration (hot-plug)
@@ -43,8 +43,8 @@ sudo apt-get install nodejs
 
 ## Run sample DEMO
 
-Before, copy on your RaspberryPi lengueaje models and dictionary for run the DEMO or generated
-them (see section: Custom lenguage and phrases for recognition)
+Before, copy on your RaspberryPi language models and dictionary for run the DEMO or generated
+them (see section: Custom language and phrases for recognition)
 
 ``` javascript
 cd /home/pi
@@ -95,7 +95,7 @@ message WakeWordParams {
 
   MicChannel channel = 2;
 
-  // lenguaje model path from lmtool or similar alternative:
+  // language model path from lmtool or similar alternative:
   // http://www.speech.cs.cmu.edu/tools/lmtool-new.html
   string lm_path = 3;
 
@@ -184,7 +184,7 @@ updateSocket.on('message', function(wakeword_buffer) {
 
 ```
 
-## Custom lenguage and phrases for recognition 
+## Custom language and phrases for recognition 
 
 1. Make a text plane like this: 
 
