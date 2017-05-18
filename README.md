@@ -205,6 +205,8 @@ updateSocket.on('message', function(wakeword_buffer) {
 
 3. Dowload *TARXXXXX.tgz* and upgrade assets directory.
 
+4. **NOTE**: change wakeword and paths on config/start wakeword service method
+
 
 
 
