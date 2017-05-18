@@ -70,8 +70,9 @@ The driver follows the [MALOS protocol](https://github.com/matrix-io/matrix-crea
 
 ### 0MQ Port
 ```
-20049
+60001
 ```
+
 ### Protocol buffers
 
 ``` javascript
@@ -124,7 +125,7 @@ var creator_ip = '127.0.0.1'
 var creator_wakeword_base_port = 60001;
 ```
 
-#### config and start Wakeup service
+#### Config and start wakeupword service
 
 ``` javascript
 /**************************************
@@ -143,12 +144,8 @@ function startWakeUpRecognition(){
 }
 ```
 
-#### stop Wakeup service
-``` javascript
+#### Stop wakeupword service
 
-```
-
-#### stop Wakeup service
 ``` javascript
 function stopWakeUpRecognition(){
   console.log('<== stop wakeword recognition..')
@@ -158,7 +155,7 @@ function stopWakeUpRecognition(){
 }
 ```
 
-#### register Wakeup callbacks (voice commands)
+#### Register wakeupword callbacks (voice commands)
 ``` javascript
 var updateSocket = zmq.socket('sub')
 updateSocket.connect('tcp://' + creator_ip + ':' + (creator_wakeword_base_port + 3))
