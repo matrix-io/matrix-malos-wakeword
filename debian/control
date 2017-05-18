@@ -1,0 +1,16 @@
+Source: matrix-creator-malos-wakeword
+Section: embedded
+Priority: optional
+Maintainer: Admobilize <info@admobilize.com>
+Build-Depends: debhelper (>= 9), cmake
+Standards-Version: 3.9.5
+Homepage: https://github.com/matrix-io/matrix-malos-wakeword
+
+Package: matrix-creator-malos-wakeword
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends},pocketsphinx,sphinxbase,libblas3,libasound2,libblas-dev,libasound2-dev,matrix-creator-malos,matrix-creator-init,libmatrix-malos-dev
+Description: Voice commands for MATRIX Creator hardware via ZMQ callback.
+ Matrix Creator (https://creator.matrix.one) is a board that can be added
+ to a Raspberry Pi v2 or v3. This board has many sensors and microphones. 
+ This program allows other programs to access the board hardware via ZMQ and
+ receive voice commands from its microphones.

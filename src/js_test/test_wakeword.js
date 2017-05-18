@@ -80,8 +80,6 @@ updateSocket.on('message', function(wakeword_buffer) {
       case "MIA RING CLEAR":
         setEverloop(0, 0, 0, 0, 0) 
         break;
-      default:
-        console.log('==> Not handled voice command')
     }
 });
 

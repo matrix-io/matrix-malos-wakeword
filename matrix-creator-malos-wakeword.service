@@ -1,0 +1,10 @@
+[Unit]
+Description=Wakeword service for Matrix Abstraction Layer for OS
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/malos_wakeword
+
+[Install]
+WantedBy=multi-user.target
+After=matrix-creator-malos.service

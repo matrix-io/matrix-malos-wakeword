@@ -1,0 +1,5 @@
+matrix-creator-malos-wakeword (0.1.2) unstable; urgency=medium
+
+  * MALOS Wakeword service (voice commands for MATRIX Creator)
+
+ -- Antonio Vanegas <hpsaturn@gmail.com>  Thu, 18 May 2017 14:56:53 +0000
