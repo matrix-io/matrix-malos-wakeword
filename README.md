@@ -190,25 +190,24 @@ updateSocket.on('message', function(wakeword_buffer) {
 
 ## Custom lenguage and phrases for recognition 
 
-+ Make a text plane like this: 
-``` 
-matrix everloop
-matrix clear
-matrix stop
-matrix ipaddress
-matrix game time
-matrix one minute
-matrix two minutes
-matrix three minutes
-matrix four minutes
-matrix five minutes
-matrix ten seconds
-matrix ten minutes
-```
+1. Make a text plane like this: 
 
-+ Upload this file to [Sphinx Knowledge Base Tool](http://www.speech.cs.cmu.edu/tools/lmtool-new.html) and compile knowledge base.
+  ``` 
+  matrix everloop
+  matrix clear
+  matrix stop
+  matrix ipaddress
+  matrix ring red
+  matrix reng green
+  matrix game time
+  matrix five minutes
+  matrix ten seconds
+  matrix close door
+  ```
 
-+ Dowload *TARXXXXX.tgz* and upgrade assets: 
+2. Upload this file to [Sphinx Knowledge Base Tool](http://www.speech.cs.cmu.edu/tools/lmtool-new.html) and compile knowledge base.
+
+3. Dowload *TARXXXXX.tgz* and upgrade assets directory.
 
 
 
