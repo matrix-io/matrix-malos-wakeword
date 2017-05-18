@@ -128,10 +128,6 @@ var creator_wakeword_base_port = 60001;
 #### Config and start wakeupword service
 
 ``` javascript
-/**************************************
- * start/stop service functions
- **************************************/
-
 function startWakeUpRecognition(){
   console.log('<== config wakeword recognition..')
   var wakeword_config = new matrixMalosBuilder.WakeWordParams;
