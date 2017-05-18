@@ -15,13 +15,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <unistd.h>
+#include <sys/stat.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <cstring>
 #include <iostream>
-#include <unistd.h>
 #include <string>
-#include <sys/stat.h>
 
 #include "./driver_wakeword.h"
 #include "./src/driver.pb.h"
@@ -30,25 +30,24 @@ namespace {}  // namespace
 
 namespace matrix_malos {
 
-inline bool exists_path (const std::string& name) {
-  struct stat buffer;   
-  return (stat (name.c_str(), &buffer) == 0); 
+inline bool exists_path(const std::string &name) {
+  struct stat buffer;
+  return (stat(name.c_str(), &buffer) == 0);
 }
 
 bool WakeWordDriver::ProcessConfig(const DriverConfig &config) {
   stopPipe();
   WakeWordParams wakeword_params(config.wakeword());
-  if(wakeword_params.stop_recognition()){
+  if (wakeword_params.stop_recognition()) {
     std::cout << "==> disable wakeword service.." << std::endl;
     return true;
   }
   loadParameters(wakeword_params);
-  if(validatePaths()){
+  if (validatePaths()) {
     verbose = wakeword_params.enable_verbose();
     enable = startPipe();
     return enable;
-  }
-  else {
+  } else {
     zmq_push_error_->Send("invalid configuration paths");
     return false;
   }
@@ -60,19 +59,18 @@ void WakeWordDriver::loadParameters(WakeWordParams wakeword_params) {
   lm_path = std::string("" + wakeword_params.lm_path());
   dic_path = std::string("" + wakeword_params.dic_path());
   std::cout << "==> wakeword: " << wakeword << std::endl;
-  std::cout << "==> lenguaje path: " << lm_path <<  std::endl;
-  std::cout << "==> dictionary path: " << dic_path <<  std::endl;
+  std::cout << "==> lenguaje path: " << lm_path << std::endl;
+  std::cout << "==> dictionary path: " << dic_path << std::endl;
 }
 
 bool WakeWordDriver::startPipe() {
-  std::string cmd =
-      std::string("./malos_psphinx -keyphrase \"" + wakeword +
-                  "\" -kws_threshold 1e-20 -dict \"" + dic_path + 
-                  "\" -lm \"" + lm_path + 
-                  "\" -inmic yes -adcdev mic_channel" +
-                  std::to_string(channel));
+  std::string cmd = std::string(
+      "./malos_psphinx -keyphrase \"" + wakeword +
+      "\" -kws_threshold 1e-20 -dict \"" + dic_path + "\" -lm \"" + lm_path +
+      "\" -inmic yes -adcdev mic_channel" + std::to_string(channel));
 
-  if(!verbose)cmd=cmd + " 2> /dev/null";
+  if (!verbose)
+    cmd = cmd + " 2> /dev/null";
 
   std::cout << "Starting PocketSphinx thread.." << std::endl;
   if (!(sphinx_pipe_ = popen(cmd.c_str(), "r"))) {
@@ -126,10 +124,13 @@ void WakeWordDriver::returnMatch(std::string match) {
   zqm_push_update_->Send(buffer);
 }
 
-bool WakeWordDriver::validatePaths(){
-  if(!exists_path(dic_path))return false;
-  if(!exists_path(lm_path))return false;
+bool WakeWordDriver::validatePaths() {
+  if (!exists_path(dic_path))
+    return false;
+  if (!exists_path(lm_path))
+    return false;
   return true;
 }
 
 }  // namespace matrix_malos
+
