@@ -26,12 +26,13 @@ sudo apt-get install matrix-creator-init matrix-creator-malos cmake g++ git libz
 reboot
 ```
 
-Add some dependencies and pocketsphinx package:
+Install matrix-creator-malos-wakeword package and dependencies:
 
 ``` 
 echo "deb http://unstable-packages.matrix.one/ stable main" | sudo tee -a /etc/apt/sources.list
 sudo apt-get update
 sudo apt-get install matrix-creator-malos-wakeword --no-install-recommends
+sudo reboot
 ```
 
 Nodejs and npm on RaspberryPi:
