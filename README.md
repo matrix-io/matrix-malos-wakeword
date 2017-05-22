@@ -47,7 +47,7 @@ sudo apt-get install nodejs
 First, copy on your RaspberryPi language models and dictionary for run the DEMO or generated
 them (see section: Custom language and phrases for recognition)
 
-``` javascript
+``` bash
 cd /home/pi
 git clone --recursive https://github.com/matrix-io/matrix-malos-wakeword.git
 cp -r matrix-malos-wakeword/assets .
@@ -57,7 +57,7 @@ cp -r matrix-malos-wakeword/assets .
 Run nodejs example and say some voice commands: `mia ring red`, `mia ring
 orange`, `mia ring clear` for example:
 
-``` javascript
+``` bash
 cd matrix-malos-wakeword
 git submodule init && git submodule update
 cd src/js_test
@@ -209,7 +209,61 @@ updateSocket.on('message', function(wakeword_buffer) {
 4. **NOTE**: change wakeword and paths on config/start wakeword service method
 
 
+## Build Debian package from source
 
+Update source and submodules:
 
+``` bash
+cd matrix-malos-wakeword
+git submodule update --init --recursive
+
+```
+
+For preparation for build debian package first extract sources with [git-archive-all.sh](https://github.com/meitar/git-archive-all.sh/wiki) like this:
+
+``` bash
+sudo apt-get install devscripts dh-make --no-install-recommends
+mkdir ../work
+git-archive-all.sh
+mv malos-wakeword.tar ../work/
+cd .. && mkdir matrix-creator-malos-wakeword-0.1.2 && cd matrix-creator-malos-wakeword-0.1.2
+tar xf ../malos-wakeword.tar
+cd .. && tar Jcf matrix-creator-malos-wakeword_0.1.2.orig.tar.xz matrix-creator-malos-wakeword-0.1.2
+```
+**Note**: please check or change version number and check `xz` extension
+
+Run `dh_make` with `m` option:
+
+``` bash
+cd matrix-creator-malos-wakeword-0.1.2
+dh_make
+```
+
+Output like this:
+
+``` bash
+pi:matrix-creator-malos-wakeword-0.1.2$ dh_make
+
+Type of package: single binary, indep binary, multiple binary, library, kernel module, kernel patch?
+ [s/i/m/l/k/n] m
+
+Maintainer name  : unknown
+Email-Address    : pi@unknown 
+Date             : Mon, 22 May 2017 18:25:49 -0500
+Package Name     : matrix-creator-malos-wakeword
+Version          : 0.1.2
+License          : blank
+Type of Package  : Multi-Binary
+Hit <enter> to confirm: 
+Skipping creating ../matrix-creator-malos-wakeword_0.1.2.orig.tar.xz because it already exists
+You already have a debian/ subdirectory in the source tree.
+dh_make will not try to overwrite anything.
+```
+
+Build Debian package:
+
+``` bash
+debuild -us -uc
+```
 
 
