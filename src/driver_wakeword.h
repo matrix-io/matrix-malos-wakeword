@@ -18,37 +18,70 @@
 #ifndef SRC_DRIVER_WAKEWORD_H_
 #define SRC_DRIVER_WAKEWORD_H_
 
+#include <cstdio>
 #include <memory>
+#include <thread>
 
-#include <matrix_malos/malos_base.h>
 #include "./src/driver.pb.h"
+#include <matrix_malos/malos_base.h>
 
 const char kWakeWordDriverName[] = "WakeWord";
 
 namespace matrix_malos {
 
-// FIXME: inherit from malos_base.h
-
 class WakeWordDriver : public MalosBase {
- public:
+public:
   WakeWordDriver() : MalosBase(kWakeWordDriverName) {
     SetNeedsKeepalives(true);
     SetMandatoryConfiguration(true);
-    SetNotesForHuman("WakeWord Driver v0.1");
+    SetNotesForHuman("WakeWord Driver v0.1.2");
   }
 
-  // Read configuration from the outside workd.
-  bool ProcessConfig(const DriverConfig& config) override;
+  // Reads configuration from the outside workd.
+  bool ProcessConfig(const DriverConfig &config) override;
 
-  // Send updates. Checks for new messages from WakeWord.
-  bool SendUpdate() override;
+private:
+  // Thread that read events from malos_psphinx command
+  void PocketSphinxProcess();
 
- private:
+  // Reads config parameters from proto
+  void loadParameters(WakeWordParams wakeword_params);
 
-  // message used to store WakeWord and mic config
-  WakeWordParams wakeword_params;
+  // Starts malos_psphinx thread
+  bool startPipe();
+
+  // Kills malos_psphinx thread
+  bool stopPipe();
+
+  // Sends via zmq_push voice commands found
+  void returnMatch(std::string match);
+
+  // Validates language and dictionary paths
+  bool validatePaths();
+
+  // Pipe handler for pocketsphinx
+  FILE *sphinx_pipe_ = NULL;
+
+  // sets main wakeword parameter, like "MATRIX"
+  std::string wakeword;
+
+  // sets language models path
+  std::string lm_path;
+
+  // sets dictionary models path
+  std::string dic_path;
+
+  // sets microphone channel (0-8)
+  // 0-7 individual mic, 8 all mics on the same time
+  int16_t channel = 8;
+
+  // sets enable/disable voice detection service
+  bool enabled = false;
+
+  // sets pocketsphinx verbose output
+  bool verbose = false;
 };
 
-}  // namespace matrix_malos
+} // namespace matrix_malos
 
-#endif  // SRC_DRIVER_WAKEWORD_H_
+#endif // SRC_DRIVER_WAKEWORD_H_

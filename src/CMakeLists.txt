@@ -24,6 +24,8 @@ message(STATUS "ZMQ found => " "${ZMQ_LIB}")
 message(STATUS "HAL found => " "${HAL_LIB}")
 message(STATUS "MATRIX LIB found => " "${MATRIX_LIB}")
 message(STATUS "MATRIX ZMQ LIB found => " "${MATRIX_ZMQ_LIB}")
+message(STATUS "SPHINXBASE_LIBRARIES => " "${SPHINXBASE_LIBRARIES}")
+message(STATUS "POCKETSPHINX_LIBRARIES => " "${POCKETSPHINX_LIBRARIES}")
 
 PROTOBUF_GENERATE_CPP(MALOS_PROTO_SRC MALOS_PROTO_HEADER ../protocol-buffers/malos/driver.proto)
 
@@ -33,21 +35,25 @@ include_directories(
 
 set(malos_wakeword_src
   malos_wakeword.cpp
-  driver_manager.cpp driver_manager.h
   driver_wakeword.cpp driver_wakeword.h
   ${MALOS_PROTO_SRC} ${MALOS_PROTO_HEADER}
 )
 
 add_executable(malos_wakeword ${malos_wakeword_src})
   set_property(TARGET malos_wakeword PROPERTY CXX_STANDARD 11)
-  target_include_directories(malos_wakeword PUBLIC ${SPHINXBASE_INCLUDE_DIRS})
-  target_include_directories(malos_wakeword PUBLIC ${POCKETSPHINX_INCLUDE_DIRS})
   target_link_libraries(malos_wakeword ${PROTOBUF_LIBRARY})
   target_link_libraries(malos_wakeword ${CMAKE_THREAD_LIBS_INIT})
   target_link_libraries(malos_wakeword ${MATRIX_LIB})
   target_link_libraries(malos_wakeword ${MATRIX_ZMQ_LIB} ${ZMQ_LIB})
-  target_link_libraries(malos_wakeword ${SPHINXBASE_LIBRARIES})
-  target_link_libraries(malos_wakeword ${POCKETSPHINX_LIBRARIES})
+
+add_executable(malos_psphinx malos_psphinx.cpp)
+  set_property(TARGET malos_psphinx PROPERTY CXX_STANDARD 11)
+  target_include_directories(malos_psphinx PUBLIC ${SPHINXBASE_INCLUDE_DIRS})
+  target_include_directories(malos_psphinx PUBLIC ${POCKETSPHINX_INCLUDE_DIRS})
+  target_link_libraries(malos_psphinx ${SPHINXBASE_LIBRARIES})
+  target_link_libraries(malos_psphinx ${POCKETSPHINX_LIBRARIES})
 
 # Binary to be installed.
 install(TARGETS malos_wakeword DESTINATION bin)
+install(TARGETS malos_psphinx DESTINATION bin)
+

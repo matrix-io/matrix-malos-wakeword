@@ -14,106 +14,124 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-#include <assert.h>
+
+#include <unistd.h>
+#include <sys/stat.h>
 #include <stdio.h>
-#include <cstring>
-#include <chrono>
-#include <thread>
-#include <iostream>
 #include <stdlib.h>
+#include <cstring>
+#include <iostream>
 #include <string>
-#include <sphinxbase/ad.h>
-#include <sphinxbase/err.h>
-#include "pocketsphinx.h"
 
 #include "./driver_wakeword.h"
 #include "./src/driver.pb.h"
 
 namespace {
 
-static ps_decoder_t *ps_;
-static cmd_ln_t *config_;
-
-/* Sleep for specified msec */
-static void sleep_msec(int32 ms) {
-#if (defined(_WIN32) && !defined(GNUWINCE)) || defined(_WIN32_WCE)
-  Sleep(ms);
-#else
-  /* ------------------- Unix ------------------ */
-  struct timeval tmo;
-
-  tmo.tv_sec = 0;
-  tmo.tv_usec = ms * 1000;
-
-  select(0, NULL, NULL, NULL, &tmo);
-#endif
+inline bool exists_path(const std::string &name) {
+  struct stat buffer;
+  return (stat(name.c_str(), &buffer) == 0);
 }
-
-/*
- * Main utterance processing loop:
- *     for (;;) {
- *        start utterance and wait for speech to process
- *        decoding till end-of-utterance silence will be detected
- *        print utterance result;
- *     }
- */
-static void recognize_from_microphone() {
-  ad_rec_t *ad;
-  if ((ad = ad_open_dev(cmd_ln_str_r(config_, "-adcdev"),
-                        (int)cmd_ln_float32_r(config_, "-samprate"))) == NULL)
-    E_FATAL("Failed to open audio device\n");
-  if (ad_start_rec(ad) < 0)
-    E_FATAL("Failed to start recording\n");
-
-  if (ps_start_utt(ps_) < 0)
-    E_FATAL("Failed to start utterance\n");
-  uint8 utt_started = FALSE;
-  E_INFO("Ready....\n");
-
-  int32 audio;
-  int16 adbuf[2048];
-  const char *hyp;
-  for (;;) {
-    if ((audio = ad_read(ad, adbuf, 2048)) < 0)
-      E_FATAL("Failed to read audio\n");
-    ps_process_raw(ps_, adbuf, audio, FALSE, FALSE);
-    const int8 in_speech = ps_get_in_speech(ps_);
-    if (in_speech && !utt_started) {
-      utt_started = TRUE;
-      E_INFO("Listening...\n");
-    }
-    if (!in_speech && utt_started) {
-      /* speech -> silence transition, time to start new utterance  */
-      ps_end_utt(ps_);
-      hyp = ps_get_hyp(ps_, NULL);
-      if (hyp != NULL) {
-        //process_rules(hyp);
-        fflush(stdout);
-      }
-
-      if (ps_start_utt(ps_) < 0)
-        E_FATAL("Failed to start utterance\n");
-      utt_started = FALSE;
-      E_INFO("Ready....\n");
-    }
-    sleep_msec(10);
-  }
-  ad_close(ad);
-}
-
-} // namespace
+}  // namespace
 
 namespace matrix_malos {
 
-bool WakeWordDriver::ProcessConfig(const DriverConfig& config) {
-  // TODO @hpsaturn: Validate all the data that comes from the protos
+bool WakeWordDriver::ProcessConfig(const DriverConfig &config) {
+  stopPipe();
   WakeWordParams wakeword_params(config.wakeword());
+  if (wakeword_params.stop_recognition()) {
+    std::cerr << "==> disable wakeword service.." << std::endl;
+    return true;
+  }
+  loadParameters(wakeword_params);
+  if (validatePaths()) {
+    verbose = wakeword_params.enable_verbose();
+    enabled = startPipe();
+    return enabled;
+  } else {
+    zmq_push_error_->Send("invalid configuration paths");
+    return false;
+  }
+}
+
+void WakeWordDriver::loadParameters(WakeWordParams wakeword_params) {
+  channel = static_cast<int16_t>(wakeword_params.channel());
+  wakeword = std::string("" + wakeword_params.wake_word());
+  lm_path = std::string("" + wakeword_params.lm_path());
+  dic_path = std::string("" + wakeword_params.dic_path());
+  std::cerr << "==> wakeword: " << wakeword << std::endl;
+  std::cerr << "==> lenguaje path: " << lm_path << std::endl;
+  std::cerr << "==> dictionary path: " << dic_path << std::endl;
+}
+
+bool WakeWordDriver::startPipe() {
+  std::string cmd = std::string(
+      "malos_psphinx -keyphrase \"" + wakeword +
+      "\" -kws_threshold 1e-20 -dict \"" + dic_path + "\" -lm \"" + lm_path +
+      "\" -inmic yes -adcdev mic_channel" + std::to_string(channel));
+
+  if (!verbose)
+    cmd = cmd + " 2> /dev/null";
+
+  std::cout << "Starting PocketSphinx thread.." << std::endl;
+  if (!(sphinx_pipe_ = popen(cmd.c_str(), "r"))) {
+    return false;
+  }
+  // alsa thread.
+  std::thread pocketsphinx_thread(&WakeWordDriver::PocketSphinxProcess, this);
+  pocketsphinx_thread.detach();
+  returnMatch("voice recognition ready");
 
   return true;
 }
 
-bool WakeWordDriver::SendUpdate() {
-
+bool WakeWordDriver::stopPipe() {
+  if (sphinx_pipe_ != NULL && enabled) {
+    enabled = false;
+    std::cout << "Stoping PocketSphinx thread.." << std::endl;
+    if (system("killall malos_psphinx") == -1) {
+      return false;
+    }
+    sleep(1);  // for possible conflict with startPipe on config
+  }
   return true;
 }
+
+void WakeWordDriver::PocketSphinxProcess() {
+  char buff[512];
+  char match[100];
+  snprintf(match, sizeof(match), "match: %s", wakeword.c_str());
+
+  // processing pipe output
+  while (fgets(buff, sizeof(buff), sphinx_pipe_) != NULL && enabled) {
+    std::string sbuff = buff;
+    if (sbuff.find(match) != std::string::npos) {
+      std::cerr << "[SEND] recognition " << sbuff;
+      sbuff = sbuff.substr(sbuff.find_first_of(" \t") + 1);
+      sbuff = sbuff.erase(sbuff.length() - 1);
+      returnMatch(sbuff);
+    } else {
+      std::cerr << "[SKIP] recognition " << sbuff;
+    }
+  }
+  pclose(sphinx_pipe_);
 }
+
+void WakeWordDriver::returnMatch(std::string match) {
+  WakeWordParams wakewordUpdate;
+  wakewordUpdate.set_wake_word(match);
+  std::string buffer;
+  wakewordUpdate.SerializeToString(&buffer);
+  zqm_push_update_->Send(buffer);
+}
+
+bool WakeWordDriver::validatePaths() {
+  if (!exists_path(dic_path))
+    return false;
+  if (!exists_path(lm_path))
+    return false;
+  return true;
+}
+
+}  // namespace matrix_malos
+
