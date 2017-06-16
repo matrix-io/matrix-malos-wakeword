@@ -31,7 +31,7 @@ Install matrix-creator-malos-wakeword package and dependencies:
 ``` 
 echo "deb http://unstable-packages.matrix.one/ stable main" | sudo tee -a /etc/apt/sources.list
 sudo apt-get update
-sudo apt-get install matrix-creator-malos-wakeword --no-install-recommends
+sudo apt-get install matrix-creator-malos-wakeword 
 sudo reboot
 ```
 
@@ -61,6 +61,7 @@ orange`, `mia ring clear` for example:
 cd matrix-malos-wakeword
 git submodule init && git submodule update
 cd src/js_test
+sudo npm installt
 node test_wakeword.js
 ```
 
@@ -209,7 +210,7 @@ updateSocket.on('message', function(wakeword_buffer) {
 4. **NOTE**: change wakeword and paths on config/start wakeword service method
 
 
-## Build Debian package from source
+## Build Debian package from source (optional)
 
 Update source and submodules:
 
