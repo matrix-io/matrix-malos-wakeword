@@ -16,6 +16,7 @@ pkg_search_module(POCKETSPHINX REQUIRED pocketsphinx)
 # This won't find ZQM in custom locations.
 # FIXME(nelson.castillo): Improve.
 FIND_LIBRARY(ZMQ_LIB NAMES zmq)
+FIND_LIBRARY(MATRIX_PROTOS_LIB NAMES matrixio_protos)
 FIND_LIBRARY(HAL_LIB NAMES matrix_creator_hal)
 FIND_LIBRARY(MATRIX_LIB NAMES matrix_malos)
 FIND_LIBRARY(MATRIX_ZMQ_LIB NAMES matrix_malos_zmq)
@@ -41,10 +42,10 @@ link_directories(${CMAKE_BINARY_DIR}/protocol-buffers/matrixlabs)
 
 add_executable(malos_wakeword ${malos_wakeword_src})
   set_property(TARGET malos_wakeword PROPERTY CXX_STANDARD 11)
-  target_link_libraries(malos_wakeword build_protos)
   target_link_libraries(malos_wakeword ${PROTOBUF_LIBRARY})
   target_link_libraries(malos_wakeword ${CMAKE_THREAD_LIBS_INIT})
   target_link_libraries(malos_wakeword ${MATRIX_LIB})
+  target_link_libraries(malos_wakeword ${MATRIX_PROTOS_LIB})
   target_link_libraries(malos_wakeword ${MATRIX_ZMQ_LIB} ${ZMQ_LIB})
 
 add_executable(malos_psphinx malos_psphinx.cpp)

@@ -25,7 +25,7 @@
 
 #include "./driver_wakeword.h"
 
-#include "../protocol-buffers/matrixlabs/driver.pb.h"
+#include <matrix_io/malos/v1/driver.pb.h>
 
 namespace {
 
@@ -35,13 +35,13 @@ inline bool exists_path(const std::string &name) {
 }
 }  // namespace
 
-namespace pb = matrixlabs::malos::v1;
+namespace pb = matrix_io::malos::v1;
 
 namespace matrix_malos {
 
 bool WakeWordDriver::ProcessConfig(const pb::driver::DriverConfig &config) {
   stopPipe();
-  pb::driver::WakeWordParams wakeword_params(config.wakeword());
+  pb::io::WakeWordParams wakeword_params(config.wakeword());
   if (wakeword_params.stop_recognition()) {
     std::cerr << "==> disable wakeword service.." << std::endl;
     return true;
@@ -58,7 +58,7 @@ bool WakeWordDriver::ProcessConfig(const pb::driver::DriverConfig &config) {
 }
 
 void WakeWordDriver::loadParameters(
-    const pb::driver::WakeWordParams &wakeword_params) {
+    const pb::io::WakeWordParams &wakeword_params) {
   channel = static_cast<int16_t>(wakeword_params.channel());
   wakeword = std::string("" + wakeword_params.wake_word());
   lm_path = std::string("" + wakeword_params.lm_path());
@@ -121,7 +121,7 @@ void WakeWordDriver::PocketSphinxProcess() {
 }
 
 void WakeWordDriver::returnMatch(std::string match) {
-  pb::driver::WakeWordParams wakewordUpdate;
+  pb::io::WakeWordParams wakewordUpdate;
   wakewordUpdate.set_wake_word(match);
   std::string buffer;
   wakewordUpdate.SerializeToString(&buffer);

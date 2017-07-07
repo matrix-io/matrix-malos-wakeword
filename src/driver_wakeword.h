@@ -22,12 +22,12 @@
 #include <memory>
 #include <thread>
 
-#include "../protocol-buffers/matrixlabs/driver.pb.h"
+#include <matrix_io/malos/v1/driver.pb.h>
 #include <matrix_malos/malos_base.h>
 
 const char kWakeWordDriverName[] = "WakeWord";
 
-namespace pb = matrixlabs::malos::v1;
+namespace pb = matrix_io::malos::v1;
 
 namespace matrix_malos {
 
@@ -47,7 +47,7 @@ class WakeWordDriver : public MalosBase {
   void PocketSphinxProcess();
 
   // Reads config parameters from proto
-  void loadParameters(const pb::driver::WakeWordParams &wakeword_params);
+  void loadParameters(const pb::io::WakeWordParams &wakeword_params);
 
   // Starts malos_psphinx thread
   bool startPipe();
