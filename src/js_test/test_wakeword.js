@@ -10,14 +10,31 @@
 // BasePort + 2 => Error port. Receive errros from device.
 // BasePort + 3 => Data port. Receive data from device.
 
-var creator_ip = '127.0.0.1';
-var creator_wakeword_base_port = 60001;
+//var creator_ip = '127.0.0.1'
+var creator_ip = '10.0.0.173'
+var creator_wakeword_base_port = 60001
 var creator_everloop_base_port = 20013 + 8 // port for Everloop driver.
-var protoBuf = require("protobufjs");
-var zmq = require('zmq');
+var Root = require("protobufjs").Root
+var zmq = require('zmq')
 
-var protoBuilder = protoBuf.loadProtoFile('../../protocol-buffers/malos/driver.proto');
-var matrixMalosBuilder = protoBuilder.build("matrix_malos");
+const PROTO_PATH = '../../protocol-buffers/' // keep the trailing slash
+const LM_PATH = '/home/pi/assets/9854.lm'
+const DIC_PATH = '/home/pi/assets/9854.dic'
+
+// ******** Load proto messages ************
+var root = new Root()
+root.loadSync([
+  PROTO_PATH + 'matrix_io/malos/v1/driver.proto',
+  PROTO_PATH + 'matrix_io/malos/v1/io.proto',
+  PROTO_PATH + 'matrix_io/malos/v1/comm.proto',
+  PROTO_PATH + 'matrix_io/malos/v1/sense.proto'
+])
+
+var DriverConfigProto = root.lookup('matrix_io.malos.v1.driver.DriverConfig')
+var EverloopImageProto = root.lookup('matrix_io.malos.v1.io.EverloopImage')
+var LedValueProto = root.lookup('matrix_io.malos.v1.io.LedValue')
+var WakeWordParamsProto = root.lookup('matrix_io.malos.v1.io.WakeWordParams')
+
 var configSocket = zmq.socket('push')
 configSocket.connect('tcp://' + creator_ip + ':' + creator_wakeword_base_port /* config */)
 
@@ -36,19 +53,20 @@ errorSocket.on('message', function(error_message) {
 
 function startWakeUpRecognition(){
   console.log('<== config wakeword recognition..')
-  var wakeword_config = new matrixMalosBuilder.WakeWordParams;
-  wakeword_config.set_wake_word("MIA");
-  wakeword_config.set_lm_path("/home/pi/assets/9854.lm");
-  wakeword_config.set_dic_path("/home/pi/assets/9854.dic");
-  wakeword_config.set_channel(matrixMalosBuilder.WakeWordParams.MicChannel.channel8);
-  wakeword_config.set_enable_verbose(false)
+  var wakeword_config = WakeWordParamsProto.create({
+    wakeWord: 'MIA',
+    lmPath: LM_PATH,
+    dicPath: DIC_PATH,
+    channel: WakeWordParamsProto.MicChannel.channel8,
+    enableVerbose: false
+  });
+
   sendConfigProto(wakeword_config);
 }
 
 function stopWakeUpRecognition(){
   console.log('<== stop wakeword recognition..')
-  var wakeword_config = new matrixMalosBuilder.WakeWordParams;
-  wakeword_config.set_stop_recognition(true)
+  var wakeword_config = WakeWordParamsProto.create({stopRecognition: true});
   sendConfigProto(wakeword_config);
 }
 
@@ -61,10 +79,10 @@ updateSocket.connect('tcp://' + creator_ip + ':' + (creator_wakeword_base_port +
 updateSocket.subscribe('')
 
 updateSocket.on('message', function(wakeword_buffer) {
-  var wakeWordData = new matrixMalosBuilder.WakeWordParams.decode(wakeword_buffer);
-  console.log('==> WakeWord Reached:',wakeWordData.wake_word)
+  var wakeWordData = WakeWordParamsProto.decode(wakeword_buffer);
+  console.log('==> WakeWord Reached:', wakeWordData.wakeWord)
     
-    switch(wakeWordData.wake_word) {
+    switch(wakeWordData.wakeWord) {
       case "MIA RING RED":
         setEverloop(255, 0, 25, 0, 0.05)
         break;
@@ -91,17 +109,22 @@ var ledsConfigSocket = zmq.socket('push')
 ledsConfigSocket.connect('tcp://' + creator_ip + ':' + creator_everloop_base_port /* config */)
 
 function setEverloop(r, g, b, w, i) {
-    var config = new matrixMalosBuilder.DriverConfig
-    config.image = new matrixMalosBuilder.EverloopImage
+    var image = EverloopImageProto.create();
     for (var j = 0; j < 35; ++j) {
-      var ledValue = new matrixMalosBuilder.LedValue;
-      ledValue.setRed(Math.round(r*i));
-      ledValue.setGreen(Math.round(g*i));
-      ledValue.setBlue(Math.round(b*i));
-      ledValue.setWhite(Math.round(w*i));
-      config.image.led.push(ledValue)
+      var ledValue = LedValueProto.create({
+        red: Math.round(r*i),
+        green: Math.round(g*i),
+        blue: Math.round(b*i),
+        white: Math.round(w*i)
+      });
+      image.led.push(ledValue)
     }
-    ledsConfigSocket.send(config.encode().toBuffer());
+    var config = DriverConfigProto.create({
+      image: image
+    })
+    const serialized = JSON.stringify(DriverConfigProto.toObject(config))
+    console.log('==> Everloop event', serialized)
+    ledsConfigSocket.send(DriverConfigProto.encode(config).finish());
 }
 
 /**************************************
@@ -109,9 +132,10 @@ function setEverloop(r, g, b, w, i) {
  **************************************/
 
 function sendConfigProto(cfg){
-  var config = new matrixMalosBuilder.DriverConfig
-  config.set_wakeword(cfg)
-  configSocket.send(config.encode().toBuffer())
+  var config = DriverConfigProto.create({ wakeword: cfg })
+  const serialized = JSON.stringify(DriverConfigProto.toObject(config))
+  console.log("==> sending conf ", serialized)
+  configSocket.send(DriverConfigProto.encode(config).finish())
 }
 
 /**********************************************
