@@ -33,3 +33,7 @@
 
 # Vim
 *.swp
+
+# Debian Build
+build
+src/js_test/node_modules/
