@@ -47,8 +47,8 @@ int RunServer() {
 
   driver_manager.ServeInfoRequestsForEver();
 
-  return 0; // Never reached.
+  return 0;  // Never reached.
 }
-} // namespace matrix_malos
+}  // namespace matrix_malos
 
 int main(int, char *[]) { return matrix_malos::RunServer(); }

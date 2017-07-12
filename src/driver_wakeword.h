@@ -22,15 +22,17 @@
 #include <memory>
 #include <thread>
 
-#include "./src/driver.pb.h"
+#include <matrix_io/malos/v1/driver.pb.h>
 #include <matrix_malos/malos_base.h>
 
 const char kWakeWordDriverName[] = "WakeWord";
 
+namespace pb = matrix_io::malos::v1;
+
 namespace matrix_malos {
 
 class WakeWordDriver : public MalosBase {
-public:
+ public:
   WakeWordDriver() : MalosBase(kWakeWordDriverName) {
     SetNeedsKeepalives(true);
     SetMandatoryConfiguration(true);
@@ -38,14 +40,14 @@ public:
   }
 
   // Reads configuration from the outside workd.
-  bool ProcessConfig(const DriverConfig &config) override;
+  bool ProcessConfig(const pb::driver::DriverConfig &config) override;
 
-private:
+ private:
   // Thread that read events from malos_psphinx command
   void PocketSphinxProcess();
 
   // Reads config parameters from proto
-  void loadParameters(WakeWordParams wakeword_params);
+  void loadParameters(const pb::io::WakeWordParams &wakeword_params);
 
   // Starts malos_psphinx thread
   bool startPipe();
@@ -82,6 +84,6 @@ private:
   bool verbose = false;
 };
 
-} // namespace matrix_malos
+}  // namespace matrix_malos
 
-#endif // SRC_DRIVER_WAKEWORD_H_
+#endif  // SRC_DRIVER_WAKEWORD_H_
