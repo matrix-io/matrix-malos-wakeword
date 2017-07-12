@@ -236,62 +236,27 @@ updateSocket.on('message', function(wakeword_buffer) {
 
 ## Build Debian package from source (optional)
 
-Update source and submodules:
+Update source and submodules and install headers:
 
 ``` bash
 cd matrix-malos-wakeword
 git submodule update --init --recursive
-
+sudo apt-get install libmatrixio-protos-dev
 ```
 
-For preparation for build debian package first extract sources with [git-archive-all.sh](https://github.com/meitar/git-archive-all.sh/wiki) like this:
+Build Debian package on RaspberryPi:
 
 ``` bash
-sudo apt-get install devscripts dh-make --no-install-recommends
-mkdir ../work
-git-archive-all.sh
-mv malos-wakeword.tar ../work/
-cd .. && mkdir matrix-creator-malos-wakeword-0.1.2 && cd matrix-creator-malos-wakeword-0.1.2
-tar xf ../malos-wakeword.tar
-cd .. && tar Jcf matrix-creator-malos-wakeword_0.1.2.orig.tar.xz matrix-creator-malos-wakeword-0.1.2
+debuild -us -uc -j4
 ```
-**Note**: please check or change version number and check `xz` extension
 
-Run `dh_make` with `m` option:
+Install and start wakeword service:
 
 ``` bash
-cd matrix-creator-malos-wakeword-0.1.2
-dh_make
+cd ..
+sudo dpkg -i ../matrix-creator-malos-wakeword_xxx_armhf.deb
+sudo service matrix-creator-malos-wakeword start
 ```
 
-Output like this:
-
-``` bash
-pi:matrix-creator-malos-wakeword-0.1.2$ dh_make
-
-Type of package: single binary, indep binary, multiple binary, library, kernel module, kernel patch?
- [s/i/m/l/k/n] m
-
-Maintainer name  : unknown
-Email-Address    : pi@unknown 
-Date             : Mon, 22 May 2017 18:25:49 -0500
-Package Name     : matrix-creator-malos-wakeword
-Version          : 0.1.2
-License          : blank
-Type of Package  : Multi-Binary
-Hit <enter> to confirm: 
-Skipping creating ../matrix-creator-malos-wakeword_0.1.2.orig.tar.xz because it already exists
-You already have a debian/ subdirectory in the source tree.
-dh_make will not try to overwrite anything.
-```
-You already have a debian/ subdirectory in the source tree.
-dh_make will not try to overwrite anything.
-```
-
-Build Debian package:
-
-``` bash
-debuild -us -uc
-```
 
 
