@@ -67,7 +67,7 @@ sudo npm installt
 node test_wakeword.js
 ```
 
-[explanation](https://github.com/matrix-io/matrix-malos-wakeword/tree/av/blob/master/README.md#javascript-example)
+[explanation](#javascript-example)
 
 ## Documentation
 
