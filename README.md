@@ -23,10 +23,10 @@ echo "deb http://packages.matrix.one/matrix-creator/ ./" | sudo tee --append /et
 sudo apt-get clean
 sudo apt-get update
 sudo apt-get upgrade
-sudo apt-get install matrix-creator-init cmake g++ git libzmq3-dev --no-install-recommends
+sudo apt-get install matrix-creator-init wiringpi cmake g++ git libzmq3-dev --no-install-recommends
 reboot
 ```
-** NOTE: ** Please check that sensors and everloop work well. For more details: [Getting Started Guide](https://matrix-io.github.io/matrix-documentation/MALOS/overview/)
+**NOTE**: Please check that sensors and everloop work well. For more details: [Getting Started Guide](https://matrix-io.github.io/matrix-documentation/MALOS/overview/)
 
 
 Install matrix-creator-malos-wakeword package and dependencies:
@@ -66,6 +66,8 @@ cd src/js_test
 sudo npm installt
 node test_wakeword.js
 ```
+
+[explanation](https://github.com/matrix-io/matrix-malos-wakeword/tree/av/blob/master/README.md#javascript-example)
 
 ## Documentation
 
