@@ -1,5 +1,11 @@
+matrix-creator-malos-wakeword (0.1.3) unstable; urgency=medium
+
+  * Testing new protobuf namespaces
+
+ -- Admobilize <info@admobilze.com>  Wed, 12 Jul 2017 09:56:53 +0000
+
 matrix-creator-malos-wakeword (0.1.2) unstable; urgency=medium
 
   * MALOS Wakeword service (voice commands for MATRIX Creator)
 
- -- Antonio Vanegas <hpsaturn@gmail.com>  Thu, 18 May 2017 14:56:53 +0000
+ -- Admobilize <info@admobilze.com>  Thu, 18 May 2017 14:56:53 +0000
