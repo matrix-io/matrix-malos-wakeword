@@ -67,11 +67,11 @@ bool WakeWordDriver::startPipe(bool withWakeword) {
   std::string cmd;
   if (withWakeword) {
     cmd = std::string(
-        "./malos_psphinx -keyphrase \"" + wakeword +
+        "malos_psphinx -keyphrase \"" + wakeword +
         "\" -kws_threshold 1e-20 -dict \"" + dic_path + "\" -lm \"" + lm_path +
         "\" -inmic yes -adcdev mic_channel" + std::to_string(channel));
   } else {
-    cmd = std::string("./malos_psphinx -inmic yes -adcdev mic_channel" +
+    cmd = std::string("malos_psphinx -inmic yes -adcdev mic_channel" +
                       std::to_string(channel));
   }
   if (!verbose)
