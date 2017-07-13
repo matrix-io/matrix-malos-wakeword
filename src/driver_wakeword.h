@@ -49,8 +49,9 @@ class WakeWordDriver : public MalosBase {
   // Reads config parameters from proto
   void loadParameters(const pb::io::WakeWordParams &wakeword_params);
 
-  // Starts malos_psphinx thread
-  bool startPipe();
+  // Starts malos_psphinx thread 
+  // withWakeword parameter is true if there paths
+  bool startPipe(bool withWakeword);
 
   // Kills malos_psphinx thread
   bool stopPipe();
