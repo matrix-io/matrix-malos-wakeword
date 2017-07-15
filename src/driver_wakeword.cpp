@@ -24,7 +24,8 @@
 #include <string>
 
 #include "./driver_wakeword.h"
-#include "./src/driver.pb.h"
+
+#include <matrix_io/malos/v1/driver.pb.h>
 
 namespace {
 
@@ -34,11 +35,13 @@ inline bool exists_path(const std::string &name) {
 }
 }  // namespace
 
+namespace pb = matrix_io::malos::v1;
+
 namespace matrix_malos {
 
-bool WakeWordDriver::ProcessConfig(const DriverConfig &config) {
+bool WakeWordDriver::ProcessConfig(const pb::driver::DriverConfig &config) {
   stopPipe();
-  WakeWordParams wakeword_params(config.wakeword());
+  pb::io::WakeWordParams wakeword_params(config.wakeword());
   if (wakeword_params.stop_recognition()) {
     std::cerr << "==> disable wakeword service.." << std::endl;
     return true;
@@ -54,7 +57,8 @@ bool WakeWordDriver::ProcessConfig(const DriverConfig &config) {
   }
 }
 
-void WakeWordDriver::loadParameters(WakeWordParams wakeword_params) {
+void WakeWordDriver::loadParameters(
+    const pb::io::WakeWordParams &wakeword_params) {
   channel = static_cast<int16_t>(wakeword_params.channel());
   wakeword = std::string("" + wakeword_params.wake_word());
   lm_path = std::string("" + wakeword_params.lm_path());
@@ -70,8 +74,7 @@ bool WakeWordDriver::startPipe() {
       "\" -kws_threshold 1e-20 -dict \"" + dic_path + "\" -lm \"" + lm_path +
       "\" -inmic yes -adcdev mic_channel" + std::to_string(channel));
 
-  if (!verbose)
-    cmd = cmd + " 2> /dev/null";
+  if (!verbose) cmd = cmd + " 2> /dev/null";
 
   std::cout << "Starting PocketSphinx thread.." << std::endl;
   if (!(sphinx_pipe_ = popen(cmd.c_str(), "r"))) {
@@ -118,7 +121,7 @@ void WakeWordDriver::PocketSphinxProcess() {
 }
 
 void WakeWordDriver::returnMatch(std::string match) {
-  WakeWordParams wakewordUpdate;
+  pb::io::WakeWordParams wakewordUpdate;
   wakewordUpdate.set_wake_word(match);
   std::string buffer;
   wakewordUpdate.SerializeToString(&buffer);
@@ -126,12 +129,9 @@ void WakeWordDriver::returnMatch(std::string match) {
 }
 
 bool WakeWordDriver::validatePaths() {
-  if (!exists_path(dic_path))
-    return false;
-  if (!exists_path(lm_path))
-    return false;
+  if (!exists_path(dic_path)) return false;
+  if (!exists_path(lm_path)) return false;
   return true;
 }
 
 }  // namespace matrix_malos
-
