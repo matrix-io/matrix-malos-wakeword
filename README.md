@@ -16,15 +16,18 @@ Wakeword voice service for MALOS. The last version support:
 
 ### Raspbian Dependencies 
 
-Before, please install MALOS on your RaspberryPi3 and perform device reboot. For more details: [Getting Started Guide](https://github.com/matrix-io/matrix-creator-quickstart/wiki/2.-Getting-Started)
+Before, please install FPGA and MCU drivers on your RaspberryPi3 and perform device reboot. 
 
 ``` 
 echo "deb http://packages.matrix.one/matrix-creator/ ./" | sudo tee --append /etc/apt/sources.list
+sudo apt-get clean
 sudo apt-get update
 sudo apt-get upgrade
-sudo apt-get install matrix-creator-init matrix-creator-malos cmake g++ git libzmq3-dev --no-install-recommends
+sudo apt-get install matrix-creator-init wiringpi cmake g++ git libzmq3-dev --no-install-recommends
 reboot
 ```
+**NOTE**: Please check that sensors and everloop work well. For more details: [Getting Started Guide](https://matrix-io.github.io/matrix-documentation/MALOS/overview/)
+
 
 Install matrix-creator-malos-wakeword package and dependencies:
 
@@ -53,7 +56,6 @@ git clone --recursive https://github.com/matrix-io/matrix-malos-wakeword.git
 cp -r matrix-malos-wakeword/assets .
 ```
 
-
 Run nodejs example and say some voice commands: `mia ring red`, `mia ring
 orange`, `mia ring clear` for example:
 
@@ -64,6 +66,8 @@ cd src/js_test
 sudo npm installt
 node test_wakeword.js
 ```
+
+[explanation](#javascript-example)
 
 ## Documentation
 
@@ -127,16 +131,38 @@ var creator_ip = '127.0.0.1'
 var creator_wakeword_base_port = 60001;
 ```
 
+#### Load Proto files
+
+``` javascript
+var driverProtoBuilder = protoBuf.loadProtoFile({
+  root: PROTO_PATH, 
+  file: 'matrix_io/malos/v1/driver.proto'
+})
+var ioProtoBuilder = protoBuf.loadProtoFile({
+  root: PROTO_PATH, 
+  file: 'matrix_io/malos/v1/io.proto'
+})
+
+var matrix = {
+  malos: {
+    v1: {
+      driver: driverProtoBuilder.build("matrix_io.malos.v1.driver"),
+      io: ioProtoBuilder.build("matrix_io.malos.v1.io")
+    }
+  }
+}
+```
+
 #### Config and start wakeupword service
 
 ``` javascript
 function startWakeUpRecognition(){
   console.log('<== config wakeword recognition..')
-  var wakeword_config = new matrixMalosBuilder.WakeWordParams;
+  var wakeword_config = new matrix.malos.v1.io.WakeWordParams;
   wakeword_config.set_wake_word("MIA");
   wakeword_config.set_lm_path("/home/pi/assets/9854.lm");
   wakeword_config.set_dic_path("/home/pi/assets/9854.dic");
-  wakeword_config.set_channel(matrixMalosBuilder.WakeWordParams.MicChannel.channel0);
+  wakeword_config.set_channel(matrix.malos.v1.io.WakeWordParams.MicChannel.channel8);
   wakeword_config.set_enable_verbose(false)
   sendConfigProto(wakeword_config);
 }
@@ -147,20 +173,21 @@ function startWakeUpRecognition(){
 ``` javascript
 function stopWakeUpRecognition(){
   console.log('<== stop wakeword recognition..')
-  var wakeword_config = new matrixMalosBuilder.WakeWordParams;
+  var wakeword_config = new matrix.malos.v1.io.WakeWordParams;
   wakeword_config.set_stop_recognition(true)
   sendConfigProto(wakeword_config);
 }
 ```
 
 #### Register wakeupword callbacks (voice commands)
+
 ``` javascript
 var updateSocket = zmq.socket('sub')
 updateSocket.connect('tcp://' + creator_ip + ':' + (creator_wakeword_base_port + 3))
 updateSocket.subscribe('')
 
 updateSocket.on('message', function(wakeword_buffer) {
-  var wakeWordData = new matrixMalosBuilder.WakeWordParams.decode(wakeword_buffer);
+  var wakeWordData = new matrix.malos.v1.io.WakeWordParams.decode(wakeword_buffer);
   console.log('==> WakeWord Reached:',wakeWordData.wake_word)
     
     switch(wakeWordData.wake_word) {
@@ -179,11 +206,8 @@ updateSocket.on('message', function(wakeword_buffer) {
       case "MIA RING CLEAR":
         setEverloop(0, 0, 0, 0, 0) 
         break;
-      default:
-        text = "==> Not handled voice command";
     }
 });
-
 ```
 
 ## Custom language and phrases for recognition 
@@ -212,59 +236,27 @@ updateSocket.on('message', function(wakeword_buffer) {
 
 ## Build Debian package from source (optional)
 
-Update source and submodules:
+Update source and submodules and install headers:
 
 ``` bash
 cd matrix-malos-wakeword
 git submodule update --init --recursive
-
+sudo apt-get install libmatrixio-protos-dev
 ```
 
-For preparation for build debian package first extract sources with [git-archive-all.sh](https://github.com/meitar/git-archive-all.sh/wiki) like this:
+Build Debian package on RaspberryPi:
 
 ``` bash
-sudo apt-get install devscripts dh-make --no-install-recommends
-mkdir ../work
-git-archive-all.sh
-mv malos-wakeword.tar ../work/
-cd .. && mkdir matrix-creator-malos-wakeword-0.1.2 && cd matrix-creator-malos-wakeword-0.1.2
-tar xf ../malos-wakeword.tar
-cd .. && tar Jcf matrix-creator-malos-wakeword_0.1.2.orig.tar.xz matrix-creator-malos-wakeword-0.1.2
+debuild -us -uc -j4
 ```
-**Note**: please check or change version number and check `xz` extension
 
-Run `dh_make` with `m` option:
+Install and start wakeword service:
 
 ``` bash
-cd matrix-creator-malos-wakeword-0.1.2
-dh_make
+cd ..
+sudo dpkg -i ../matrix-creator-malos-wakeword_xxx_armhf.deb
+sudo service matrix-creator-malos-wakeword start
 ```
 
-Output like this:
-
-``` bash
-pi:matrix-creator-malos-wakeword-0.1.2$ dh_make
-
-Type of package: single binary, indep binary, multiple binary, library, kernel module, kernel patch?
- [s/i/m/l/k/n] m
-
-Maintainer name  : unknown
-Email-Address    : pi@unknown 
-Date             : Mon, 22 May 2017 18:25:49 -0500
-Package Name     : matrix-creator-malos-wakeword
-Version          : 0.1.2
-License          : blank
-Type of Package  : Multi-Binary
-Hit <enter> to confirm: 
-Skipping creating ../matrix-creator-malos-wakeword_0.1.2.orig.tar.xz because it already exists
-You already have a debian/ subdirectory in the source tree.
-dh_make will not try to overwrite anything.
-```
-
-Build Debian package:
-
-``` bash
-debuild -us -uc
-```
 
 
