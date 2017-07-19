@@ -10,29 +10,15 @@
 // BasePort + 2 => Error port. Receive errros from device.
 // BasePort + 3 => Data port. Receive data from device.
 
-var creator_ip = '127.0.0.1'
+var creator_ip = process.env.CREATOR_IP || '127.0.0.1';
 var creator_wakeword_base_port = 60001
 var creator_everloop_base_port = 20013 + 8 // port for Everloop driver.
-var Root = require("protobufjs").Root
 var zmq = require('zmq')
+var matrix_io = require('matrix_io-proto').matrix_io;
 
-const PROTO_PATH = '../../protocol-buffers/' // keep the trailing slash
+//const PROTO_PATH = '../../protocol-buffers/' // keep the trailing slash
 const LM_PATH = '/home/pi/assets/9854.lm'
 const DIC_PATH = '/home/pi/assets/9854.dic'
-
-// ******** Load proto messages ************
-var root = new Root()
-root.loadSync([
-  PROTO_PATH + 'matrix_io/malos/v1/driver.proto',
-  PROTO_PATH + 'matrix_io/malos/v1/io.proto',
-  PROTO_PATH + 'matrix_io/malos/v1/comm.proto',
-  PROTO_PATH + 'matrix_io/malos/v1/sense.proto'
-])
-
-var DriverConfigProto = root.lookup('matrix_io.malos.v1.driver.DriverConfig')
-var EverloopImageProto = root.lookup('matrix_io.malos.v1.io.EverloopImage')
-var LedValueProto = root.lookup('matrix_io.malos.v1.io.LedValue')
-var WakeWordParamsProto = root.lookup('matrix_io.malos.v1.io.WakeWordParams')
 
 var configSocket = zmq.socket('push')
 configSocket.connect('tcp://' + creator_ip + ':' + creator_wakeword_base_port /* config */)
@@ -52,11 +38,11 @@ errorSocket.on('message', function(error_message) {
 
 function startWakeUpRecognition(){
   console.log('<== config wakeword recognition..')
-  var wakeword_config = WakeWordParamsProto.create({
+  var wakeword_config = matrix_io.malos.v1.io.WakeWordParams.create({
     wakeWord: 'MIA',
     lmPath: LM_PATH,
     dicPath: DIC_PATH,
-    channel: WakeWordParamsProto.MicChannel.channel8,
+    channel: matrix_io.malos.v1.io.WakeWordParams.MicChannel.channel8,
     enableVerbose: false
   });
 
@@ -65,7 +51,7 @@ function startWakeUpRecognition(){
 
 function stopWakeUpRecognition(){
   console.log('<== stop wakeword recognition..')
-  var wakeword_config = WakeWordParamsProto.create({stopRecognition: true});
+  var wakeword_config = matrix_io.malos.v1.io.WakeWordParams.create({stopRecognition: true});
   sendConfigProto(wakeword_config);
 }
 
@@ -78,7 +64,7 @@ updateSocket.connect('tcp://' + creator_ip + ':' + (creator_wakeword_base_port +
 updateSocket.subscribe('')
 
 updateSocket.on('message', function(wakeword_buffer) {
-  var wakeWordData = WakeWordParamsProto.decode(wakeword_buffer);
+  var wakeWordData = matrix_io.malos.v1.io.WakeWordParams.decode(wakeword_buffer);
   console.log('==> WakeWord Reached:', wakeWordData.wakeWord)
     
     switch(wakeWordData.wakeWord) {
@@ -108,9 +94,9 @@ var ledsConfigSocket = zmq.socket('push')
 ledsConfigSocket.connect('tcp://' + creator_ip + ':' + creator_everloop_base_port /* config */)
 
 function setEverloop(r, g, b, w, i) {
-    var image = EverloopImageProto.create();
+    var image = matrix_io.malos.v1.io.EverloopImage.create();
     for (var j = 0; j < 35; ++j) {
-      var ledValue = LedValueProto.create({
+      var ledValue = matrix_io.malos.v1.io.LedValue.create({
         red: Math.round(r*i),
         green: Math.round(g*i),
         blue: Math.round(b*i),
@@ -118,12 +104,12 @@ function setEverloop(r, g, b, w, i) {
       });
       image.led.push(ledValue)
     }
-    var config = DriverConfigProto.create({
+    var config = matrix_io.malos.v1.driver.DriverConfig.create({
       image: image
     })
-    const serialized = JSON.stringify(DriverConfigProto.toObject(config))
+    const serialized = JSON.stringify(matrix_io.malos.v1.driver.DriverConfig.toObject(config))
     console.log('==> Everloop event', serialized)
-    ledsConfigSocket.send(DriverConfigProto.encode(config).finish());
+    ledsConfigSocket.send(matrix_io.malos.v1.driver.DriverConfig.encode(config).finish());
 }
 
 /**************************************
@@ -131,10 +117,10 @@ function setEverloop(r, g, b, w, i) {
  **************************************/
 
 function sendConfigProto(cfg){
-  var config = DriverConfigProto.create({ wakeword: cfg })
-  const serialized = JSON.stringify(DriverConfigProto.toObject(config))
+  var config = matrix_io.malos.v1.driver.DriverConfig.create({ wakeword: cfg })
+  const serialized = JSON.stringify(matrix_io.malos.v1.driver.DriverConfig.toObject(config))
   console.log("==> sending conf ", serialized)
-  configSocket.send(DriverConfigProto.encode(config).finish())
+  configSocket.send(matrix_io.malos.v1.driver.DriverConfig.encode(config).finish())
 }
 
 /**********************************************
