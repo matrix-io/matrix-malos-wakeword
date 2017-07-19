@@ -107,8 +107,8 @@ function setEverloop(r, g, b, w, i) {
     var config = matrix_io.malos.v1.driver.DriverConfig.create({
       image: image
     })
-    const serialized = JSON.stringify(matrix_io.malos.v1.driver.DriverConfig.toObject(config))
-    console.log('==> Everloop event', serialized)
+
+    // Send the configuration
     ledsConfigSocket.send(matrix_io.malos.v1.driver.DriverConfig.encode(config).finish());
 }
 
