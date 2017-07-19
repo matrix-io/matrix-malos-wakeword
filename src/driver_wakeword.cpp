@@ -24,7 +24,8 @@
 #include <string>
 
 #include "./driver_wakeword.h"
-#include "./src/driver.pb.h"
+
+#include <matrix_io/malos/v1/driver.pb.h>
 
 namespace {
 
@@ -34,27 +35,25 @@ inline bool exists_path(const std::string &name) {
 }
 }  // namespace
 
+namespace pb = matrix_io::malos::v1;
+
 namespace matrix_malos {
 
-bool WakeWordDriver::ProcessConfig(const DriverConfig &config) {
+bool WakeWordDriver::ProcessConfig(const pb::driver::DriverConfig &config) {
   stopPipe();
-  WakeWordParams wakeword_params(config.wakeword());
+  pb::io::WakeWordParams wakeword_params(config.wakeword());
   if (wakeword_params.stop_recognition()) {
     std::cerr << "==> disable wakeword service.." << std::endl;
     return true;
   }
   loadParameters(wakeword_params);
-  if (validatePaths()) {
-    verbose = wakeword_params.enable_verbose();
-    enabled = startPipe();
-    return enabled;
-  } else {
-    zmq_push_error_->Send("invalid configuration paths");
-    return false;
-  }
+  verbose = wakeword_params.enable_verbose();
+  return startPipe(validatePaths());
+    //zmq_push_error_->Send("invalid configuration paths");
 }
 
-void WakeWordDriver::loadParameters(WakeWordParams wakeword_params) {
+void WakeWordDriver::loadParameters(
+    const pb::io::WakeWordParams &wakeword_params) {
   channel = static_cast<int16_t>(wakeword_params.channel());
   wakeword = std::string("" + wakeword_params.wake_word());
   lm_path = std::string("" + wakeword_params.lm_path());
@@ -64,16 +63,20 @@ void WakeWordDriver::loadParameters(WakeWordParams wakeword_params) {
   std::cerr << "==> dictionary path: " << dic_path << std::endl;
 }
 
-bool WakeWordDriver::startPipe() {
-  std::string cmd = std::string(
-      "malos_psphinx -keyphrase \"" + wakeword +
-      "\" -kws_threshold 1e-20 -dict \"" + dic_path + "\" -lm \"" + lm_path +
-      "\" -inmic yes -adcdev mic_channel" + std::to_string(channel));
-
+bool WakeWordDriver::startPipe(bool withWakeword) {
+  std::string cmd;
+  if (withWakeword) {
+    cmd = std::string(
+        "malos_psphinx -keyphrase \"" + wakeword +
+        "\" -kws_threshold 1e-20 -dict \"" + dic_path + "\" -lm \"" + lm_path +
+        "\" -inmic yes -adcdev mic_channel" + std::to_string(channel));
+  } else {
+    cmd = std::string("malos_psphinx -inmic yes -adcdev mic_channel" +
+                      std::to_string(channel));
+  }
   if (!verbose)
     cmd = cmd + " 2> /dev/null";
 
-  std::cout << "Starting PocketSphinx thread.." << std::endl;
   if (!(sphinx_pipe_ = popen(cmd.c_str(), "r"))) {
     return false;
   }
@@ -81,8 +84,9 @@ bool WakeWordDriver::startPipe() {
   std::thread pocketsphinx_thread(&WakeWordDriver::PocketSphinxProcess, this);
   pocketsphinx_thread.detach();
   returnMatch("voice recognition ready");
+  enabled = true;
 
-  return true;
+  return enabled;
 }
 
 bool WakeWordDriver::stopPipe() {
@@ -118,7 +122,7 @@ void WakeWordDriver::PocketSphinxProcess() {
 }
 
 void WakeWordDriver::returnMatch(std::string match) {
-  WakeWordParams wakewordUpdate;
+  pb::io::WakeWordParams wakewordUpdate;
   wakewordUpdate.set_wake_word(match);
   std::string buffer;
   wakewordUpdate.SerializeToString(&buffer);
@@ -126,12 +130,9 @@ void WakeWordDriver::returnMatch(std::string match) {
 }
 
 bool WakeWordDriver::validatePaths() {
-  if (!exists_path(dic_path))
-    return false;
-  if (!exists_path(lm_path))
-    return false;
+  if (!exists_path(dic_path)) return false;
+  if (!exists_path(lm_path)) return false;
   return true;
 }
 
 }  // namespace matrix_malos
-

@@ -1,0 +1,9 @@
+#!/bin/bash -e
+
+echo "Removing MALOS wakeword service"
+systemctl stop matrix-creator-malos-wakeword
+systemctl disable matrix-creator-malos-wakeword
+systemctl daemon-reload
+systemctl reset-failed
+
+
