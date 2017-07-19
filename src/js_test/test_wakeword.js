@@ -13,10 +13,10 @@
 var creator_ip = process.env.CREATOR_IP || '127.0.0.1';
 var creator_wakeword_base_port = 60001
 var creator_everloop_base_port = 20013 + 8 // port for Everloop driver.
+// Packaged Protocol buffers
+var matrix_io = require('matrix-protos').matrix_io;
 var zmq = require('zmq')
-var matrix_io = require('matrix_io-proto').matrix_io;
 
-//const PROTO_PATH = '../../protocol-buffers/' // keep the trailing slash
 const LM_PATH = '/home/pi/assets/9854.lm'
 const DIC_PATH = '/home/pi/assets/9854.dic'
 
