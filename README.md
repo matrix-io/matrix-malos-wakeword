@@ -61,9 +61,8 @@ orange`, `mia ring clear` for example:
 
 ``` bash
 cd matrix-malos-wakeword
-git submodule init && git submodule update
 cd src/js_test
-sudo npm installt
+npm install
 node test_wakeword.js
 ```
 
@@ -131,39 +130,19 @@ var creator_ip = '127.0.0.1'
 var creator_wakeword_base_port = 60001;
 ```
 
-#### Load Proto files
-
-``` javascript
-var driverProtoBuilder = protoBuf.loadProtoFile({
-  root: PROTO_PATH, 
-  file: 'matrix_io/malos/v1/driver.proto'
-})
-var ioProtoBuilder = protoBuf.loadProtoFile({
-  root: PROTO_PATH, 
-  file: 'matrix_io/malos/v1/io.proto'
-})
-
-var matrix = {
-  malos: {
-    v1: {
-      driver: driverProtoBuilder.build("matrix_io.malos.v1.driver"),
-      io: ioProtoBuilder.build("matrix_io.malos.v1.io")
-    }
-  }
-}
-```
-
 #### Config and start wakeupword service
 
 ``` javascript
 function startWakeUpRecognition(){
   console.log('<== config wakeword recognition..')
-  var wakeword_config = new matrix.malos.v1.io.WakeWordParams;
-  wakeword_config.set_wake_word("MIA");
-  wakeword_config.set_lm_path("/home/pi/assets/9854.lm");
-  wakeword_config.set_dic_path("/home/pi/assets/9854.dic");
-  wakeword_config.set_channel(matrix.malos.v1.io.WakeWordParams.MicChannel.channel8);
-  wakeword_config.set_enable_verbose(false)
+  var wakeword_config = matrix_io.malos.v1.io.WakeWordParams.create({
+    wakeWord: 'MIA',
+    lmPath: LM_PATH,
+    dicPath: DIC_PATH,
+    channel: matrix_io.malos.v1.io.WakeWordParams.MicChannel.channel8,
+    enableVerbose: false
+  });
+
   sendConfigProto(wakeword_config);
 }
 ```
@@ -173,8 +152,7 @@ function startWakeUpRecognition(){
 ``` javascript
 function stopWakeUpRecognition(){
   console.log('<== stop wakeword recognition..')
-  var wakeword_config = new matrix.malos.v1.io.WakeWordParams;
-  wakeword_config.set_stop_recognition(true)
+  var wakeword_config = matrix_io.malos.v1.io.WakeWordParams.create({stopRecognition: true});
   sendConfigProto(wakeword_config);
 }
 ```
@@ -187,10 +165,10 @@ updateSocket.connect('tcp://' + creator_ip + ':' + (creator_wakeword_base_port +
 updateSocket.subscribe('')
 
 updateSocket.on('message', function(wakeword_buffer) {
-  var wakeWordData = new matrix.malos.v1.io.WakeWordParams.decode(wakeword_buffer);
-  console.log('==> WakeWord Reached:',wakeWordData.wake_word)
+  var wakeWordData = matrix_io.malos.v1.io.WakeWordParams.decode(wakeword_buffer);
+  console.log('==> WakeWord Reached:', wakeWordData.wakeWord)
     
-    switch(wakeWordData.wake_word) {
+    switch(wakeWordData.wakeWord) {
       case "MIA RING RED":
         setEverloop(255, 0, 25, 0, 0.05)
         break;
@@ -240,7 +218,6 @@ Update source and submodules and install headers:
 
 ``` bash
 cd matrix-malos-wakeword
-git submodule update --init --recursive
 sudo apt-get install libmatrixio-protos-dev
 ```
 
