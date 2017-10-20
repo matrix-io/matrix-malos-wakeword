@@ -1,6 +1,6 @@
 [Unit]
 Description=Wakeword service for Matrix Abstraction Layer for OS
-After=matrix-creator-malos.service
+After=matrixio-malos.service
 
 [Service]
 Type=simple

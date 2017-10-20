@@ -27,12 +27,12 @@ sudo apt install matrixio-malos
 reboot
 ```
 
-Install matrix-creator-malos-wakeword package and dependencies:
+Install matrixio-malos-wakeword package and dependencies:
 
 ``` 
 echo "deb http://unstable-packages.matrix.one/ stable main" | sudo tee -a /etc/apt/sources.list
 sudo apt-get update
-sudo apt-get install matrix-creator-malos-wakeword --no-install-recommends
+sudo apt-get install matrixio-malos-wakeword --no-install-recommends
 sudo reboot
 ```
 
@@ -229,8 +229,8 @@ Install and start wakeword service:
 
 ``` bash
 cd ..
-sudo dpkg -i ../matrix-creator-malos-wakeword_xxx_armhf.deb
-sudo service matrix-creator-malos-wakeword start
+sudo dpkg -i ../matrixio-malos-wakeword_xxx_armhf.deb
+sudo service matrixio-malos-wakeword start
 ```
 
 
