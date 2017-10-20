@@ -1,1 +1,1 @@
-matrix-creator-malos-wakeword.service lib/systemd/system
+matrixio-malos-wakeword.service lib/systemd/system
