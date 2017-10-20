@@ -18,16 +18,14 @@ Wakeword voice service for MALOS. The last version support:
 
 Before, please install FPGA and MCU drivers on your RaspberryPi3 and perform device reboot. 
 
-``` 
-echo "deb http://packages.matrix.one/matrix-creator/ ./" | sudo tee --append /etc/apt/sources.list
-sudo apt-get clean
+``` bash 
+curl https://apt.matrix.one/doc/apt-key.gpg | sudo apt-key add -
+echo "deb https://apt.matrix.one/raspbian $(lsb_release -sc) main" | sudo tee /etc/apt/sources.list.d/matrixlabs.list
 sudo apt-get update
 sudo apt-get upgrade
-sudo apt-get install matrix-creator-init wiringpi cmake g++ git libzmq3-dev --no-install-recommends
+sudo apt install matrixio-malos
 reboot
 ```
-**NOTE**: Please check that sensors and everloop work well. For more details: [Getting Started Guide](https://matrix-io.github.io/matrix-documentation/MALOS/overview/)
-
 
 Install matrix-creator-malos-wakeword package and dependencies:
 
@@ -214,11 +212,11 @@ updateSocket.on('message', function(wakeword_buffer) {
 
 ## Build Debian package from source (optional)
 
-Update source and submodules and install headers:
+Update source and submodules and install headers and tools:
 
 ``` bash
 cd matrix-malos-wakeword
-sudo apt-get install libmatrixio-protos-dev
+sudo apt-get install devscripts dh-make --no-install-recommends libmatrixio-protos-dev
 ```
 
 Build Debian package on RaspberryPi:
