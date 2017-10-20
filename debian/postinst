@@ -1,5 +1,5 @@
 #!/bin/bash -e
 
 echo "Enabling MALOS wakeword service"
-systemctl enable matrix-creator-malos-wakeword
+systemctl enable matrixio-malos-wakeword
 echo "Please restart your Raspberry Pi after installation"
