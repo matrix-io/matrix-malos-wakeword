@@ -10,13 +10,14 @@ Wakeword voice service for MALOS. The last version support:
 * enable/disable pocketsphinx verbose debugging 
 * send and override configuration (hot-plug)
 * disable voice recognition service (stop pshinx main thread)
+* optional: support for null paths and models (not recommend, bad performance)
 
 
 ## Installation
 
 ### Raspbian Dependencies 
 
-Before, please install FPGA and MCU drivers on your RaspberryPi3 and perform device reboot. 
+Before, please install **MALOS** on your `RaspberryPi3` and perform device reboot: 
 
 ``` bash 
 curl https://apt.matrix.one/doc/apt-key.gpg | sudo apt-key add -
@@ -27,16 +28,14 @@ sudo apt install matrixio-malos
 reboot
 ```
 
-Install matrixio-malos-wakeword package and dependencies:
+Install `wakeword` package and dependencies:
 
-``` 
-echo "deb http://unstable-packages.matrix.one/ stable main" | sudo tee -a /etc/apt/sources.list
-sudo apt-get update
+``` nodejs 
 sudo apt-get install matrixio-malos-wakeword --no-install-recommends
 sudo reboot
 ```
 
-Nodejs and npm on RaspberryPi:
+**Nodejs** and npm on RaspberryPi:
 
 ``` 
 curl -sL https://deb.nodesource.com/setup_6.x | sudo bash -
@@ -57,9 +56,8 @@ cp -r matrix-malos-wakeword/assets .
 Run nodejs example and say some voice commands: `mia ring red`, `mia ring
 orange`, `mia ring clear` for example:
 
-``` bash
-cd matrix-malos-wakeword
-cd src/js_test
+``` nodejs
+cd matrix-malos-wakeword/src/js_test
 npm install
 node test_wakeword.js
 ```
@@ -190,7 +188,7 @@ updateSocket.on('message', function(wakeword_buffer) {
 
 1. Make a text plane like this: 
 
-  ``` 
+  ``` nodejs
   matrix everloop
   matrix clear
   matrix stop
@@ -232,6 +230,4 @@ cd ..
 sudo dpkg -i ../matrixio-malos-wakeword_xxx_armhf.deb
 sudo service matrixio-malos-wakeword start
 ```
-
-
 
