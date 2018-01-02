@@ -1,6 +1,6 @@
 Format: http://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
-Upstream-Name: matrix-creator-malos
-Source: https://github.com/matrix-io/matrix-creator-malos/
+Upstream-Name: matrixio-malos-wakeword
+Source: https://github.com/matrix-io/matrix-malos-wakeword/
 
 Files: *
 Copyright: 2017 Admobilize
