@@ -17,8 +17,8 @@ var creator_everloop_base_port = 20013 + 8 // port for Everloop driver.
 var matrix_io = require('matrix-protos').matrix_io;
 var zmq = require('zmq')
 
-const LM_PATH = '/home/pi/assets/9854.lm'
-const DIC_PATH = '/home/pi/assets/9854.dic'
+const LM_PATH = '~/assets/9854.lm'
+const DIC_PATH = '~/assets/9854.dic'
 
 var configSocket = zmq.socket('push')
 configSocket.connect('tcp://' + creator_ip + ':' + creator_wakeword_base_port /* config */)
@@ -42,8 +42,8 @@ function startWakeUpRecognition(){
     wakeWord: 'MIA',
     lmPath: LM_PATH,
     dicPath: DIC_PATH,
-    channel: matrix_io.malos.v1.io.WakeWordParams.MicChannel.channel8,
-    enableVerbose: false
+    channel: matrix_io.malos.v1.io.WakeWordParams.MicChannel.channel0,
+    enableVerbose: true
   });
 
   sendConfigProto(wakeword_config);
