@@ -7,30 +7,27 @@ ADM_EXTRA_WARNINGS()
 
 find_package(Protobuf 3 REQUIRED)
 find_package(Threads REQUIRED)
-find_package(PkgConfig)
+find_package(PkgConfig REQUIRED)
 
 FIND_LIBRARY(ZMQ_LIB NAMES zmq)
-FIND_LIBRARY(HAL_LIB NAMES matrix_creator_hal)
 FIND_LIBRARY(MATRIX_LIB NAMES matrix_malos)
 FIND_LIBRARY(MATRIX_ZMQ_LIB NAMES matrix_malos_zmq)
 FIND_LIBRARY(MATRIX_PROTOS_LIB NAMES matrixio_protos)
-FIND_LIBRARY(SPHINXBASE NAMES sphinxbase)
-FIND_LIBRARY(POCKETSPHINX NAMES pocketsphinx)
+
+pkg_check_modules(POCKETSPHINX REQUIRED pocketsphinx)
+pkg_check_modules(SPHINXBASE REQUIRED sphinxbase)
 
 message(STATUS "ZMQ found => " "${ZMQ_LIB}")
-message(STATUS "HAL found => " "${HAL_LIB}")
 message(STATUS "MATRIX LIB found => " "${MATRIX_LIB}")
 message(STATUS "MATRIX ZMQ LIB found => " "${MATRIX_ZMQ_LIB}")
 message(STATUS "MATRIXIO PROTOS=> " "${MATRIX_PROTOS_LIB}")
-message(STATUS "SPHINXBASE_LIBRARIES => " "${SPHINXBASE}")
-message(STATUS "POCKETSPHINX_LIBRARIES => " "${POCKETSPHINX}")
+message(STATUS "SPHINXBASE_LIBRARIES => " "${SPHINXBASE_LIBRARIES}")
+message(STATUS "POCKETSPHINX_LIBRARIES => " "${POCKETSPHINX_LIBRARIES}")
+message(STATUS "POCKETSPHINX_INCLUDE_DIRS => " "${POCKETSPHINX_INCLUDE_DIRS}")
+message(STATUS "SPHINXBASE_INCLUDE_DIRS => " "${SPHINXBASE_INCLUDE_DIRS}")
 
-set(CMAKE_INCLUDE_CURRENT_DIR ON)
-
-include_directories(
-  ${PROJECT_BINARY_DIR})
-
-set(malos_wakeword_src
+set(
+  malos_wakeword_src
   malos_wakeword.cpp
   driver_wakeword.cpp
 )
@@ -44,9 +41,13 @@ add_executable(malos_wakeword ${malos_wakeword_src})
   target_link_libraries(malos_wakeword ${MATRIX_ZMQ_LIB} ${ZMQ_LIB})
 
 add_executable(malos_psphinx malos_psphinx.cpp)
-  set_property(TARGET malos_psphinx PROPERTY CXX_STANDARD 11)
-  target_link_libraries(malos_psphinx ${SPHINXBASE})
-  target_link_libraries(malos_psphinx ${POCKETSPHINX})
+  set_property(TARGET malos_psphinx PROPERTY CXX_STANDARD 11)  
+  target_include_directories(malos_psphinx PUBLIC ${POCKETSPHINX_INCLUDE_DIRS})
+  target_include_directories(malos_psphinx PUBLIC ${SPHINXBASE_INCLUDE_DIRS})
+  target_compile_options(malos_psphinx PUBLIC ${POCKETSPHINX_CFLAGS_OTHER})
+  target_compile_options(malos_psphinx PUBLIC ${SPHINXBASE_CFLAGS_OTHER})
+  target_link_libraries(malos_psphinx ${SPHINXBASE_LIBRARIES})
+  target_link_libraries(malos_psphinx ${POCKETSPHINX_LIBRARIES})
 
 # Binary to be installed.
 install(TARGETS malos_wakeword DESTINATION bin)
