@@ -8,7 +8,7 @@ Homepage: https://github.com/matrix-io/matrix-malos-wakeword
 
 Package: matrixio-malos-wakeword
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends},matrixio-malos,libmatrixio-malos-dev,libmatrixio-protos-dev,matrixio-pocketsphinx
+Depends: ${shlibs:Depends}, ${misc:Depends},libmatrixio-malos-dev,libmatrixio-protos-dev,matrixio-pocketsphinx
 Description: Voice commands for MATRIX Creator hardware via ZMQ callback.
  Matrix Creator (https://creator.matrix.one) is a board that can be added
  to a Raspberry Pi v2 or v3. This board has many sensors and microphones. 
