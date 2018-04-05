@@ -49,16 +49,20 @@
  * MOD: @hpsaturn (MATRIX Creator wakeword trigger)
  */
 
-#include <assert.h>
 #include <stdio.h>
 
-#include <sphinxbase/ad.h>
-#include <sphinxbase/err.h>
 #include <stdlib.h>
 #include <cstring>
 #include <iostream>
 #include <string>
+#include <assert.h>
+
+#include <sys/select.h>
+#include <sphinxbase/err.h>
+#include <sphinxbase/ad.h>
+
 #include "pocketsphinx.h"
+
 
 static const arg_t cont_args_def[] = {
     POCKETSPHINX_OPTIONS,
