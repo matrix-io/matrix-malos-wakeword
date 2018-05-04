@@ -1,3 +1,9 @@
+matrixio-malos-wakeword (0.1.5) unstable; urgency=medium
+
+  * Support matrixio-kernel-modules
+
+ -- Admobilize <info@admobilze.com>  Fri, 20 Oct 2017 17:56:53 +0000
+
 matrixio-malos-wakeword (0.1.4) unstable; urgency=medium
 
   * Add support for last matrixio packages and raspbian-stretch

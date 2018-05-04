@@ -15,37 +15,45 @@ Wakeword voice service for MALOS. The last version support:
 
 ## Installation
 
-### Raspbian Dependencies 
+### MATRIXIO MALOS 
 
-Before, please install **MALOS** on your `RaspberryPi3` and perform device reboot: 
-
-``` bash 
+```bash 
 curl https://apt.matrix.one/doc/apt-key.gpg | sudo apt-key add -
 echo "deb https://apt.matrix.one/raspbian $(lsb_release -sc) main" | sudo tee /etc/apt/sources.list.d/matrixlabs.list
-sudo apt-get update
-sudo apt-get upgrade
+sudo apt update
+sudo apt upgrade
 sudo apt install matrixio-malos
 reboot
 ```
 
-Install `wakeword` package and dependencies:
+### MATRIXIO MALOS-WakeWord
 
-``` nodejs 
-sudo apt-get install matrixio-malos-wakeword --no-install-recommends
+``` bash 
+sudo apt install matrixio-malos-wakeword 
 sudo reboot
 ```
 
-**Nodejs** and npm on RaspberryPi:
 
-``` 
-curl -sL https://deb.nodesource.com/setup_6.x | sudo bash -
-sudo apt-get install nodejs
+### NodeJS Dependency
+
+```bash
+# Install npm (doesn't really matter what version, apt-get node is v0.10...)
+sudo apt-get install npm
+
+# n is a node version manager
+sudo npm install -g n
+
+# node 6.5 is the latest target node version, also installs new npm
+n 6.5
+
+# check version
+node -v
 ```
 
-## Run sample DEMO
 
-First, copy on your RaspberryPi language models and dictionary for run the DEMO or generated
-them (see section: Custom language and phrases for recognition)
+### Run sample DEMO
+
+Copy on your RaspberryPi language the models and dictionary, it is necessary to run demos. It also should be genrated (check: Custom language and phrases for recognition)
 
 ``` bash
 cd /home/pi
@@ -53,21 +61,49 @@ git clone --recursive https://github.com/matrix-io/matrix-malos-wakeword.git
 cp -r matrix-malos-wakeword/assets .
 ```
 
-Run nodejs example and say some voice commands: `mia ring red`, `mia ring
-orange`, `mia ring clear` for example:
+Run nodejs example and say some voice commands: `mia ring red`, `mia ring orange`, `mia ring clear` for example:
 
-``` nodejs
+```bash
 cd matrix-malos-wakeword/src/js_test
 npm install
 node test_wakeword.js
 ```
 
-[explanation](#javascript-example)
+[complete description](#javascript-example)
+
+## Build from Sources
+
+### Install Dependencies
+
+```bash 
+curl https://apt.matrix.one/doc/apt-key.gpg | sudo apt-key add -
+echo "deb https://apt.matrix.one/raspbian $(lsb_release -sc) main" | sudo tee /etc/apt/sources.list.d/matrixlabs.list
+sudo apt update
+sudo apt upgrade
+sudo apt install matrixio-pocketsphinx libmatrixio-malos-dev libmatrixio-protos-dev cmake git
+```
+
+### Clone & Compile
+
+```bash
+git clone https://github.com/matrix-io/matrix-malos-wakeword.git
+cd matrix-malos-wakewrod
+mkdir build && cd build
+cmake ../
+make
+```
+
+### Execution
+
+```bash
+cd src/
+export PATH=$PATH:$PWD
+./malos_wakeword &
+```
 
 ## Documentation
 
 The driver follows the [MALOS protocol](https://github.com/matrix-io/matrix-creator-malos/blob/master/README.md#protocol).
-
 
 ### 0MQ Port
 ```

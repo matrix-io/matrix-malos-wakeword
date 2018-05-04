@@ -9,23 +9,22 @@ find_package(Protobuf 3 REQUIRED)
 find_package(Threads REQUIRED)
 find_package(PkgConfig)
 
+pkg_search_module(SPHINXBASE REQUIRED sphinxbase)
+pkg_search_module(POCKETSPHINX REQUIRED pocketsphinx)
+
 FIND_LIBRARY(ZMQ_LIB NAMES zmq)
 FIND_LIBRARY(HAL_LIB NAMES matrix_creator_hal)
 FIND_LIBRARY(MATRIX_LIB NAMES matrix_malos)
 FIND_LIBRARY(MATRIX_ZMQ_LIB NAMES matrix_malos_zmq)
 FIND_LIBRARY(MATRIX_PROTOS_LIB NAMES matrixio_protos)
-FIND_LIBRARY(SPHINXBASE NAMES sphinxbase)
-FIND_LIBRARY(POCKETSPHINX NAMES pocketsphinx)
 
 message(STATUS "ZMQ found => " "${ZMQ_LIB}")
 message(STATUS "HAL found => " "${HAL_LIB}")
 message(STATUS "MATRIX LIB found => " "${MATRIX_LIB}")
 message(STATUS "MATRIX ZMQ LIB found => " "${MATRIX_ZMQ_LIB}")
 message(STATUS "MATRIXIO PROTOS=> " "${MATRIX_PROTOS_LIB}")
-message(STATUS "SPHINXBASE_LIBRARIES => " "${SPHINXBASE}")
-message(STATUS "POCKETSPHINX_LIBRARIES => " "${POCKETSPHINX}")
-
-set(CMAKE_INCLUDE_CURRENT_DIR ON)
+message(STATUS "SPHINXBASE_LIBRARIES => " "${SPHINXBASE_LIBRARIES}")
+message(STATUS "POCKETSPHINX_LIBRARIES => " "${POCKETSPHINX_LIBRARIES}")
 
 include_directories(
   ${PROJECT_BINARY_DIR})
@@ -45,8 +44,10 @@ add_executable(malos_wakeword ${malos_wakeword_src})
 
 add_executable(malos_psphinx malos_psphinx.cpp)
   set_property(TARGET malos_psphinx PROPERTY CXX_STANDARD 11)
-  target_link_libraries(malos_psphinx ${SPHINXBASE})
-  target_link_libraries(malos_psphinx ${POCKETSPHINX})
+  target_include_directories( malos_psphinx PUBLIC ${SPHINXBASE_INCLUDE_DIRS})
+  target_include_directories( malos_psphinx PUBLIC ${POCKETSPHINX_INCLUDE_DIRS})
+  target_link_libraries(malos_psphinx ${SPHINXBASE_LIBRARIES})
+  target_link_libraries(malos_psphinx ${POCKETSPHINX_LIBRARIES})
 
 # Binary to be installed.
 install(TARGETS malos_wakeword DESTINATION bin)
