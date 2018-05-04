@@ -54,7 +54,7 @@ bool WakeWordDriver::ProcessConfig(const pb::driver::DriverConfig &config) {
 
 void WakeWordDriver::loadParameters(
     const pb::io::WakeWordParams &wakeword_params) {
-  //channel = static_cast<int16_t>(wakeword_params.channel());
+  channel = static_cast<int16_t>(wakeword_params.channel());
   wakeword = std::string("" + wakeword_params.wake_word());
   lm_path = std::string("" + wakeword_params.lm_path());
   dic_path = std::string("" + wakeword_params.dic_path());
