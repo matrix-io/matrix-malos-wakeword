@@ -9,7 +9,7 @@ pipeline:
     mountoffset: ${MOUNTOFFSET}
     body: |
       curl https://apt.matrix.one/doc/apt-key.gpg | apt-key add -
-      export COMPONENT=$([ "${DRONE_BUILD_EVENT}" = "tag" ] && echo "main" || echo "unstable")
+      export COMPONENT=$(echo "main")
       echo "deb https://apt.matrix.one/raspbian ${CODENAME} $COMPONENT" > /etc/apt/sources.list.d/matrixlabs.list
       apt-get update
       apt-get install --yes libmatrixio-malos-dev libmatrixio-protos-dev matrixio-pocketsphinx  
