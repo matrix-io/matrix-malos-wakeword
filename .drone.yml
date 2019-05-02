@@ -3,16 +3,16 @@ pipeline:
     when:
       branch: master 
       event: [ push, tag ]
-    image: gcr.io/admobilize-testing/creator-builder-${ARCHITECTURE}-${DISTRIBUTION}-${CODENAME}-${IMAGE_TAG}
+    image: gcr.io/admobilize-testing/creator-builder-${ARCHITECTURE}-${DISTRIBUTION}-${CODENAME}:${IMAGE_TAG}
     privileged: true
-    body: |
-      curl https://apt.matrix.one/doc/apt-key.gpg | apt-key add -
-      export COMPONENT=$([ "${DRONE_BUILD_EVENT}" = "tag" ] && echo "main" || echo "unstable")
-      echo "deb https://apt.matrix.one/raspbian ${CODENAME} main" > /etc/apt/sources.list.d/matrixlabs.list
-      apt-get update
-      apt-get install --yes libmatrixio-malos-dev libmatrixio-protos-dev matrixio-pocketsphinx matrixio-protobuf
-      debuild -us -uc -b
-      mv ../*.deb .
+    commands:
+      - curl https://apt.matrix.one/doc/apt-key.gpg | apt-key add -
+      - export COMPONENT=$([ "${DRONE_BUILD_EVENT}" = "tag" ] && echo "main" || echo "unstable")
+      - echo "deb https://apt.matrix.one/raspbian ${CODENAME} main" > /etc/apt/sources.list.d/matrixlabs.list
+      - apt-get update
+      - apt-get install --yes libmatrixio-malos-dev libmatrixio-protos-dev matrixio-pocketsphinx matrixio-protobuf
+      - debuild -us -uc -b
+      - mv ../*.deb .
 
   upload-debs:
     when:
