@@ -7,10 +7,9 @@ pipeline:
     privileged: true
     commands:
       - curl https://apt.matrix.one/doc/apt-key.gpg | apt-key add -
-      - export COMPONENT=$([ "${DRONE_BUILD_EVENT}" = "tag" ] && echo "main" || echo "unstable")
       - echo "deb https://apt.matrix.one/raspbian ${CODENAME} main" > /etc/apt/sources.list.d/matrixlabs.list
       - apt-get update
-      - apt-get install --yes pkg-config libmatrixio-creator-hal-dev libmatrixio-malos-dev libmatrixio-protos-dev matrixio-pocketsphinx matrixio-protobuf
+      - apt-get install --yes pkg-config libmatrixio-creator-hal-dev libmatrixio-malos-dev libmatrixio-protos-dev matrixio-pocketsphinx matrixio-protobuf liblapack-dev
       - debuild -us -uc -b
       - mv ../*.deb .
 
